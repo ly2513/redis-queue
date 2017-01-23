@@ -1,21 +1,28 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongli
+ * Date: 16/10/02
+ * Time: 18:28
+ * Email: liyong@addnewer.com
+ */
 
 namespace RedisQueue\ReQueue\Job;
 
-use RedisQueue\Resque;
+use RedisQueue\ResQueue;
+
 
 /**
- * Status tracker/information for a job.
+ * Class Status tracker/information for a job.
  *
- * @package		Resque/Job
- * @author		Chris Boulton <chris@bigcommerce.com>
- * @license		http://www.opensource.org/licenses/mit-license.php
+ * @package RedisQueue\ReQueue\Job
+ * @author  yongli  <liyong@addnewer.com>
  */
 class Status
 {
-	const STATUS_WAITING = 1;
-	const STATUS_RUNNING = 2;
-	const STATUS_FAILED = 3;
+	const STATUS_WAITING  = 1;
+	const STATUS_RUNNING  = 2;
+	const STATUS_FAILED   = 3;
 	const STATUS_COMPLETE = 4;
 
 	/**
@@ -25,17 +32,17 @@ class Status
 
 	/**
 	 * @var mixed Cache variable if the status of this job is being monitored or not.
-	 * 	True/false when checked at least once or null if not checked yet.
+	 *    True/false when checked at least once or null if not checked yet.
 	 */
 	private $isTracking = null;
 
 	/**
 	 * @var array Array of statuses that are considered final/complete.
 	 */
-	private static $completeStatuses = array(
+	private static $completeStatuses = [
 		self::STATUS_FAILED,
 		self::STATUS_COMPLETE
-	);
+	];
 
 	/**
 	 * Setup a new instance of the job monitor class for the supplied job ID.
@@ -55,12 +62,12 @@ class Status
 	 */
 	public static function create($id)
 	{
-		$statusPacket = array(
-			'status' => self::STATUS_WAITING,
+		$statusPacket = [
+			'status'  => self::STATUS_WAITING,
 			'updated' => time(),
 			'started' => time(),
-		);
-		Resque::redis()->set('job:' . $id . ':status', json_encode($statusPacket));
+		];
+		ResQueue::redis()->set('job:' . $id . ':status', json_encode($statusPacket));
 	}
 
 	/**
@@ -71,39 +78,41 @@ class Status
 	 */
 	public function isTracking()
 	{
-		if($this->isTracking === false) {
+		if ($this->isTracking === false) {
 			return false;
 		}
 
-		if(!Resque::redis()->exists((string)$this)) {
+		if (!ResQueue::redis()->exists((string)$this)) {
 			$this->isTracking = false;
+
 			return false;
 		}
 
 		$this->isTracking = true;
+
 		return true;
 	}
 
 	/**
 	 * Update the status indicator for the current job with a new status.
 	 *
-	 * @param int The status of the job (see constants in Resque_Job_Status)
+	 * @param int The status of the job (see constants in ResQueue_Job_Status)
 	 */
 	public function update($status)
 	{
-		if(!$this->isTracking()) {
+		if (!$this->isTracking()) {
 			return;
 		}
 
-		$statusPacket = array(
-			'status' => $status,
+		$statusPacket = [
+			'status'  => $status,
 			'updated' => time(),
-		);
-		Resque::redis()->set((string)$this, json_encode($statusPacket));
+		];
+		ResQueue::redis()->set((string)$this, json_encode($statusPacket));
 
 		// Expire the status for completed jobs after 24 hours
-		if(in_array($status, self::$completeStatuses)) {
-			Resque::redis()->expire((string)$this, 86400);
+		if (in_array($status, self::$completeStatuses)) {
+			ResQueue::redis()->expire((string)$this, 86400);
 		}
 	}
 
@@ -111,16 +120,16 @@ class Status
 	 * Fetch the status for the job being monitored.
 	 *
 	 * @return mixed False if the status is not being monitored, otherwise the status as
-	 * 	as an integer, based on the Resque_Job_Status constants.
+	 *    as an integer, based on the ResQueue_Job_Status constants.
 	 */
 	public function get()
 	{
-		if(!$this->isTracking()) {
+		if (!$this->isTracking()) {
 			return false;
 		}
 
-		$statusPacket = json_decode(Resque::redis()->get((string)$this), true);
-		if(!$statusPacket) {
+		$statusPacket = json_decode(ResQueue::redis()->get((string)$this), true);
+		if (!$statusPacket) {
 			return false;
 		}
 
@@ -132,7 +141,7 @@ class Status
 	 */
 	public function stop()
 	{
-		Resque::redis()->del((string)$this);
+		ResQueue::redis()->del((string)$this);
 	}
 
 	/**
@@ -145,4 +154,5 @@ class Status
 		return 'job:' . $this->id . ':status';
 	}
 }
+
 ?>

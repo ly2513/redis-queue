@@ -1,4 +1,12 @@
 <?php
+/**
+ * Redisent, a Redis interface for the modest
+ * Created by IntelliJ IDEA.
+ * User: yongli
+ * Date: 16/9/28
+ * Time: 下午1:04
+ * Email: liyong@addnewer.com
+ */
 
 namespace RedisQueue\RedisSent;
 
@@ -6,24 +14,7 @@ use Exception;
 
 use RedisException;
 
-/**
- * Redisent, a Redis interface for the modest
- * @author Justin Poliey <jdp34@njit.edu>
- * @copyright 2009 Justin Poliey <jdp34@njit.edu>
- * @license http://www.opensource.org/licenses/mit-license.php The MIT License
- * @package Redisent
- */
-
 define('CRLF', sprintf('%s%s', chr(13), chr(10)));
-
-/**
- * Wraps native Redis errors in friendlier PHP exceptions
- * Only declared if class doesn't already exist to ensure compatibility with php-redis
- */
-//if (! class_exists('RedisException', false)) {
-//    class RedisException extends Exception {
-//    }
-//}
 
 /**
  * Redisent, a Redis interface for the modest among us
@@ -53,7 +44,7 @@ class Redisent
     public $port;
 
     /**
-     * Creates a Redisent connection to the Redis server on host {@link $host} and port {@link $port}.
+     * Creates a Redisent connection to the Redis server on host and port.
      * @param string  $host The hostname of the Redis server
      * @param integer $port The port number of the Redis server
      */
@@ -79,15 +70,15 @@ class Redisent
 
     public function __call($name, $args)
     {
-
         /* Build the Redis unified protocol command */
         array_unshift($args, strtoupper($name));
-        $command = sprintf('*%d%s%s%s', count($args), CRLF, implode(array_map([$this, 'formatArgument'], $args), CRLF), CRLF);
+        $command = sprintf('*%d%s%s%s', count($args), CRLF, implode(array_map([$this, 'formatArgument'], $args), CRLF),
+            CRLF);
 
         /* Open a Redis connection and execute the command */
         for ($written = 0; $written < strlen($command); $written += $fwrite) {
             $fwrite = fwrite($this->__sock, substr($command, $written));
-            if ($fwrite === FALSE) {
+            if ($fwrite === false) {
                 throw new Exception('Failed to write entire command to stream');
             }
         }
@@ -151,6 +142,7 @@ class Redisent
                 throw new RedisException("invalid server response: {$reply}");
                 break;
         }
+
         /* Party on */
         return $response;
     }

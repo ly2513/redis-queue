@@ -1,34 +1,46 @@
 <?php
-// Third- party apps may have already loaded Resident from elsewhere
-// so lets be careful.
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongLi
+ * Date: 16/10/01
+ * Time: 11:28
+ * Email: liyong@addnewer.com
+ */
+
 namespace RedisQueue\ReQueue;
 
 use RedisQueue\RedisSent\Redisent;
 use RedisException;
 
-//if(!class_exists('Redisent', false)) {
-//	require_once dirname(__FILE__) . '/../Redisent/Redisent.php';
-//}
-
-
 /**
- * Extended Redisent class used by Resque for all communication with
+ * Extended Redisent class used by ResQueue for all communication with
  * redis. Essentially adds namespace support to Redisent.
  *
- * @package		Resque/Redis
+ * @package		ResQueue/Redis
  * @author		Chris Boulton <chris@bigcommerce.com>
  * @license		http://www.opensource.org/licenses/mit-license.php
  */
+
+/**
+ * Extended Redisent class used by ResQueue for all communication with
+ * redis. Essentially adds namespace support to Redisent.
+ *
+ * Class Redis
+ * @package RedisQueue\ReQueue
+ * @author yongli  <liyong@addnewer.com>
+ */
 class Redis extends Redisent
 {
+	
     /**
      * Redis namespace
      * @var string
      */
-    private static $defaultNamespace = 'resque:';
+    private static $defaultNamespace = 'resQueue:';
+
 	/**
 	 * @var array List of all commands in Redis that supply a key as their
-	 *	first argument. Used to prefix keys with the Resque namespace.
+	 *	first argument. Used to prefix keys with the resQueue namespace.
 	 */
 	private $keyCommands = array(
 		'exists',
@@ -88,7 +100,7 @@ class Redis extends Redisent
 	// renamenx
 	
 	/**
-	 * Set Redis namespace (prefix) default: resque
+	 * Set Redis namespace (prefix) default: resQueue
 	 * @param string $namespace
 	 */
 	public static function prefix($namespace)

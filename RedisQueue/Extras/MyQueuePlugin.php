@@ -1,4 +1,11 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongLi
+ * Date: 16/10/01
+ * Time: 11:28
+ * Email: liyong@addnewer.com
+ */
 
 namespace RedisQueue\Extras;
 

@@ -6,15 +6,15 @@
  * Time: 下午12:43
  * Email: liyong@addnewer.com
  */
-namespace TradingMax\Console\Queue;
+namespace Console;
 
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TradingMax\Console\Queue\QueueCommand;
-use RedisQueue\Resque;
+use Console\QueueCommand;
+use RedisQueue\ResQueue;
 
 use TradingMax\Model\Model;
 use TradingMax\Model\JobModel;
@@ -93,7 +93,7 @@ class CreateJobCommand extends QueueCommand
 
         $redisBackEnd = $_SERVER['REDIS_BACKEND'];
 
-        $redisBackEnd ? Resque::setBackend($redisBackEnd) : Resque::setBackend($redisServer);
+        $redisBackEnd ? ResQueue::setBackend($redisBackEnd) : ResQueue::setBackend($redisServer);
 
         $queueName = $input->getOption('queue-name');
         $queueName = $queueName ? $queueName : 'default';
@@ -155,7 +155,7 @@ EOT;
 
                 try {
                     // 队列ID
-                    $jobId = Resque::enqueue($queueName, $jobName . 'Job', $args, true);
+                    $jobId = ResQueue::enqueue($queueName, $jobName . 'Job', $args, true);
                     $output->writeln(sprintf('Create queue job success, the queue job id is "<info>%s</info>"', $jobId));
                     return true;
                 } catch (InvalidArgumentException $e) {
@@ -240,7 +240,7 @@ EOT;
 
         try {
             // 队列ID
-            $jobId = Resque::enqueue($queueName, $jobName . 'Job', $args, true);
+            $jobId = ResQueue::enqueue($queueName, $jobName . 'Job', $args, true);
             $output->writeln(sprintf('Create queue job success, the queue job id is "<info>%s</info>"', $jobId));
         } catch (InvalidArgumentException $e) {
             $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"', $e->getMessage()));

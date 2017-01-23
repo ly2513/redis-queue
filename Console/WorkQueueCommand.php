@@ -1,21 +1,20 @@
 <?php
 /**
  * Created by IntelliJ IDEA.
- * User: yongli
+ * User: yongLi
  * Date: 16/9/28
  * Time: 下午12:43
  * Email: liyong@addnewer.com
  */
-namespace TradingMax\Console\Queue;
+namespace Console;
 
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-//use Symfony\Component\Console\Command\Command;
-use TradingMax\Console\Queue\QueueCommand;
-use RedisQueue\Resque;
+use Console\QueueCommand;
+use RedisQueue\ResQueue;
 use RedisQueue\ReQueue\Worker;
 
 
@@ -68,7 +67,7 @@ class WorkQueueCommand extends QueueCommand
 //        $this->initConf();
         $redisBackEnd = $_SERVER['REDIS_BACKEND'];
 
-        $redisBackEnd ? Resque::setBackend($redisBackEnd) : Resque::setBackend($redisServer);
+        $redisBackEnd ? ResQueue::setBackend($redisBackEnd) : ResQueue::setBackend($redisServer);
 
         $queueName = $input->getOption('queue-name');
 

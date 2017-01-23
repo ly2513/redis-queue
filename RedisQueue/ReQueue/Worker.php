@@ -1,25 +1,33 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongli
+ * Date: 16/10/02
+ * Time: 10:28
+ * Email: liyong@addnewer.com
+ */
+
 namespace RedisQueue\ReQueue;
 
-use RedisQueue\Resque;
+use RedisQueue\ResQueue;
 use RedisQueue\ReQueue\Stat;
 use RedisQueue\ReQueue\Event;
 use RedisQueue\ReQueue\Job;
 use RedisQueue\ReQueue\Job\Status;
 use RedisQueue\ReQueue\Job\DirtyExitException;
 
+
 /**
- * Resque worker that handles checking queues for jobs, fetching them
+ * Class Worker redisQueue worker that handles checking queues for jobs, fetching them
  * off the queues, running them and handling the result.
  *
- * @package        Resque/Worker
- * @author        Chris Boulton <chris@bigcommerce.com>
- * @license        http://www.opensource.org/licenses/mit-license.php
+ * @package RedisQueue\ReQueue
+ * @author  yongli <liyong@addnewer.com>
  */
 class Worker
 {
-    const LOG_NONE = 0;
-    const LOG_NORMAL = 1;
+    const LOG_NONE    = 0;
+    const LOG_NORMAL  = 1;
     const LOG_VERBOSE = 2;
 
     /**
@@ -53,7 +61,7 @@ class Worker
     private $id;
 
     /**
-     * @var Resque_Job Current job, if any, being processed by this worker.
+     * @var resQueue_Job Current job, if any, being processed by this worker.
      */
     private $currentJob = null;
 
@@ -63,12 +71,12 @@ class Worker
     private $child = null;
 
     /**
-     * Return all workers known to Resque as instantiated instances.
+     * Return all workers known to resQueue as instantiated instances.
      * @return array
      */
     public static function all()
     {
-        $workers = Resque::redis()->smembers('workers');
+        $workers = ResQueue::redis()->smembers('workers');
         if (!is_array($workers)) {
             $workers = [];
         }
@@ -77,6 +85,7 @@ class Worker
         foreach ($workers as $workerId) {
             $instances[] = self::find($workerId);
         }
+
         return $instances;
     }
 
@@ -88,14 +97,14 @@ class Worker
      */
     public static function exists($workerId)
     {
-        return (bool)Resque::redis()->sismember('workers', $workerId);
+        return (bool)ResQueue::redis()->sismember('workers', $workerId);
     }
 
     /**
      * Given a worker ID, find it and return an instantiated worker class for it.
      *
      * @param string $workerId The ID of the worker.
-     * @return Resque_Worker Instance of the worker. False if the worker does not exist.
+     * @return resQueue_Worker Instance of the worker. False if the worker does not exist.
      */
     public static function find($workerId)
     {
@@ -107,13 +116,14 @@ class Worker
         $queues = explode(',', $queues);
         $worker = new self($queues);
         $worker->setId($workerId);
+
         return $worker;
     }
 
     /**
      * Set the ID of this worker to a given ID string.
      *
-     * @param string $workerId ID for the worker.
+     * @param $workerId  ID for the worker.
      */
     public function setId($workerId)
     {
@@ -129,7 +139,8 @@ class Worker
      * order. You can easily add new queues dynamically and have them worked on using
      * this method.
      *
-     * @param string|array $queues String with a single queue name, array with multiple.
+     * Worker constructor.
+     * @param $queues String with a single queue name, array with multiple.
      */
     public function __construct($queues)
     {
@@ -170,7 +181,7 @@ class Worker
             if (!$this->paused) {
                 $job = $this->reserve();
             }
-            
+
             if (!$job) {
                 // For an interval of 0, break now - helps with unit testing etc
                 if ($interval == 0) {
@@ -230,7 +241,7 @@ class Worker
     /**
      * Process a single job.
      *
-     * @param Resque_Job $job The job to be processed.
+     * @param \RedisQueue\ReQueue\Job $job The job to be processed.
      */
     public function perform(Job $job)
     {
@@ -240,6 +251,7 @@ class Worker
         } catch (Exception $e) {
             $this->log($job . ' failed: ' . $e->getMessage());
             $job->fail($e);
+
             return;
         }
 
@@ -250,7 +262,7 @@ class Worker
     /**
      * Attempt to find a job from the top of one of the queues for this worker.
      *
-     * @return object|boolean Instance of Resque_Job if a job is found, false if not.
+     * @return object|boolean Instance of redisQueue_Job if a job is found, false if not.
      */
     public function reserve()
     {
@@ -263,6 +275,7 @@ class Worker
             $job = Job::reserve($queue);
             if ($job) {
                 $this->log('Found job on ' . $queue, self::LOG_VERBOSE);
+
                 return $job;
             }
         }
@@ -287,8 +300,9 @@ class Worker
             return $this->queues;
         }
 
-        $queues = Resque::queues();
+        $queues = ResQueue::queues();
         sort($queues);
+
         return $queues;
     }
 
@@ -297,7 +311,8 @@ class Worker
      *
      * Return values are those of pcntl_fork().
      *
-     * @return int -1 if the fork failed, 0 for the forked child, the PID of the child for the parent.
+     * @return bool|int -1 if the fork failed, 0 for the forked child, the PID of the child for the parent.
+     * @throws RuntimeException
      */
     private function fork()
     {
@@ -334,7 +349,7 @@ class Worker
     private function updateProcLine($status)
     {
         if (function_exists('setproctitle')) {
-            setproctitle('resque-' . Resque::VERSION . ': ' . $status);
+            setproctitle('resque-' . ResQueue::VERSION . ': ' . $status);
         }
     }
 
@@ -389,7 +404,7 @@ class Worker
     public function reestablishRedisConnection()
     {
         $this->log('SIGPIPE received; attempting to reconnect');
-        Resque::redis()->establishConnection();
+        ResQueue::redis()->establishConnection();
     }
 
     /**
@@ -420,6 +435,7 @@ class Worker
     {
         if (!$this->child) {
             $this->log('No child to kill.', self::LOG_VERBOSE);
+
             return;
         }
 
@@ -439,7 +455,7 @@ class Worker
      * they're not, remove them from Redis.
      *
      * This is a form of garbage collection to handle cases where the
-     * server may have been killed and the Resque workers did not die gracefully
+     * server may have been killed and the resQueue workers did not die gracefully
      * and therefore leave state information in Redis.
      */
     public function pruneDeadWorkers()
@@ -459,10 +475,10 @@ class Worker
     }
 
     /**
-     * Return an array of process IDs for all of the Resque workers currently
+     * Return an array of process IDs for all of the resQueue workers currently
      * running on this machine.
      *
-     * @return array Array of Resque worker process IDs.
+     * @return array Array of redisQueue worker process IDs.
      */
     public function workerPids()
     {
@@ -471,6 +487,7 @@ class Worker
         foreach ($cmdOutput as $line) {
             list($pids[],) = explode(' ', trim($line), 2);
         }
+
         return $pids;
     }
 
@@ -479,8 +496,8 @@ class Worker
      */
     public function registerWorker()
     {
-        Resque::redis()->sadd('workers', $this);
-        Resque::redis()->set('worker:' . (string)$this . ':started', date('Y-m-d H:i:s', time()));
+        ResQueue::redis()->sadd('workers', $this);
+        ResQueue::redis()->set('worker:' . (string)$this . ':started', date('Y-m-d H:i:s', time()));
     }
 
     /**
@@ -493,9 +510,9 @@ class Worker
         }
 
         $id = (string)$this;
-        Resque::redis()->srem('workers', $id);
-        Resque::redis()->del('worker:' . $id);
-        Resque::redis()->del('worker:' . $id . ':started');
+        ResQueue::redis()->srem('workers', $id);
+        ResQueue::redis()->del('worker:' . $id);
+        ResQueue::redis()->del('worker:' . $id . ':started');
         Stat::clear('processed:' . $id);
         Stat::clear('failed:' . $id);
     }
@@ -503,7 +520,7 @@ class Worker
     /**
      * Tell Redis which job we're currently working on.
      *
-     * @param object $job Resque_Job instance containing the job we're working on.
+     * @param \RedisQueue\ReQueue\Job $job redisQueue_Job instance containing the job we're working on.
      */
     public function workingOn(Job $job)
     {
@@ -515,7 +532,7 @@ class Worker
             'run_at'  => date('Y-m-d H:i:s', time()),
             'payload' => $job->payload
         ]);
-        Resque::redis()->set('worker:' . $job->worker, $data);
+        ResQueue::redis()->set('worker:' . $job->worker, $data);
     }
 
     /**
@@ -527,7 +544,7 @@ class Worker
         $this->currentJob = null;
         Stat::incr('processed');
         Stat::incr('processed:' . (string)$this);
-        Resque::redis()->del('worker:' . (string)$this);
+        ResQueue::redis()->del('worker:' . (string)$this);
     }
 
     /**
@@ -549,8 +566,10 @@ class Worker
     {
         if ($this->logLevel == self::LOG_NORMAL) {
             fwrite(STDOUT, "*** " . $message . "\n");
-        } else if ($this->logLevel == self::LOG_VERBOSE) {
-            fwrite(STDOUT, "** [" . strftime('%T %Y-%m-%d') . "] " . $message . "\n");
+        } else {
+            if ($this->logLevel == self::LOG_VERBOSE) {
+                fwrite(STDOUT, "** [" . strftime('%T %Y-%m-%d') . "] " . $message . "\n");
+            }
         }
     }
 
@@ -561,7 +580,7 @@ class Worker
      */
     public function job()
     {
-        $job = Resque::redis()->get('worker:' . $this);
+        $job = ResQueue::redis()->get('worker:' . $this);
         if (!$job) {
             return [];
         } else {

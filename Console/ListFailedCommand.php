@@ -6,13 +6,13 @@
  * Time: 下午3:41
  * Email: liyong@addnewer.com
  */
-namespace TradingMax\Console\Queue;
+namespace Console;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
-use RedisQueue\Resque;
+use RedisQueue\ResQueue;
 
 //use TradingMax\Extend\EloquentAndQueue as initQueue;
 
@@ -56,9 +56,9 @@ class ListFailedCommand extends Command
 
         $redisServer = $_SERVER['REDIS_BACKEND'];
         $redisServer = $redisServer ? $redisServer : '127.0.0.1:6379';
-        Resque::setBackend($redisServer);
-        $length = Resque::redis()->llen('failed');
-        $failQueueList = Resque::redis()->lrange('failed', 0, $length - 1);
+        ResQueue::setBackend($redisServer);
+        $length = ResQueue::redis()->llen('failed');
+        $failQueueList = ResQueue::redis()->lrange('failed', 0, $length - 1);
         foreach ($failQueueList as $keys => $values) {
             $failQueueList[$keys] = json_decode($values, true);
         }

@@ -1,16 +1,26 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongli
+ * Date: 16/10/01
+ * Time: 11:28
+ * Email: liyong@addnewer.com
+ */
+
 namespace RedisQueue\ReQueue;
 
 use Exception;
 
+
 /**
- * Resque exception.
+ * Class QueueException
  *
- * @package		Resque
- * @author		Chris Boulton <chris@bigcommerce.com>
- * @license		http://www.opensource.org/licenses/mit-license.php
+ * @package RedisQueue\ReQueue
+ * @author yongli <liyong@addnewer.com>
  */
 class QueueException extends Exception
 {
+
 }
+
 ?>

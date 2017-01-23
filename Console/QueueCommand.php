@@ -6,7 +6,7 @@
  * Time: 下午1:04
  * Email: liyong@addnewer.com
  */
-namespace TradingMax\Console\Queue;
+namespace Console;
 
 use Symfony\Component\Console\Command\Command ;
 use Illuminate\Database\Capsule\Manager as Capsule;

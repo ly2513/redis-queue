@@ -1,12 +1,19 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongli
+ * Date: 16/9/28
+ * Time: 11:29
+ * Email: liyong@addnewer.com
+ */
 
-namespace TradingMax\Console\Queue;
+namespace Console;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
-use RedisQueue\Resque;
+use RedisQueue\ResQueue;
 use RedisQueue\ReQueue\Worker;
 
 class ListenCommand extends Command

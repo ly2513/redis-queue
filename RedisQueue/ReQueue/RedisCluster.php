@@ -1,31 +1,38 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongli
+ * Date: 16/10/01
+ * Time: 11:28
+ * Email: liyong@addnewer.com
+ */
+
 namespace RedisQueue\ReQueue;
 
 use RedisException;
-
 use RedisQueue\RedisSent\RedisentCluster;
 
 
 /**
- * Extended Redisent class used by Resque for all communication with
+ * Extended RedisCluster class used by redisQueue for all communication with
  * redis. Essentially adds namespace support to Redisent.
  *
- * @package		Resque/Redis
- * @author		Chris Boulton <chris@bigcommerce.com>
- * @license		http://www.opensource.org/licenses/mit-license.php
+ * @package RedisQueue\ReQueue
+ * @author  yongLi <liyong@addnewer.com>
  */
 class RedisCluster extends RedisentCluster
 {
-    /**
-     * Redis namespace
-     * @var string
-     */
-    private static $defaultNamespace = 'resque:';
+	/**
+	 * Redis namespace
+	 * @var string
+	 */
+	private static $defaultNamespace = 'resque:';
+	
 	/**
 	 * @var array List of all commands in Redis that supply a key as their
-	 *	first argument. Used to prefix keys with the Resque namespace.
+	 *    first argument. Used to prefix keys with the resQueue namespace.
 	 */
-	private $keyCommands = array(
+	private $keyCommands = [
 		'exists',
 		'del',
 		'type',
@@ -67,7 +74,7 @@ class RedisCluster extends RedisentCluster
 		'zscore',
 		'zremrangebyscore',
 		'sort'
-	);
+	];
 	// sinterstore
 	// sunion
 	// sunionstore
@@ -81,17 +88,17 @@ class RedisCluster extends RedisentCluster
 	// msetnx
 	// mset
 	// renamenx
-	
+
 	/**
-	 * Set Redis namespace (prefix) default: resque
+	 * Set Redis namespace (prefix) default: resQueue
 	 * @param string $namespace
 	 */
 	public static function prefix($namespace)
 	{
-	    if (strpos($namespace, ':') === false) {
-	        $namespace .= ':';
-	    }
-	    self::$defaultNamespace = $namespace;
+		if (strpos($namespace, ':') === false) {
+			$namespace .= ':';
+		}
+		self::$defaultNamespace = $namespace;
 	}
 
 	/**
@@ -99,20 +106,21 @@ class RedisCluster extends RedisentCluster
 	 * operations with the '{self::$defaultNamespace}' key prefix.
 	 *
 	 * @param string $name The name of the method called.
-	 * @param array $args Array of supplied arguments to the method.
+	 * @param array  $args Array of supplied arguments to the method.
 	 * @return mixed Return value from Resident::call() based on the command.
 	 */
-	public function __call($name, $args) {
+	public function __call($name, $args)
+	{
 		$args = func_get_args();
-		if(in_array($name, $this->keyCommands)) {
+		if (in_array($name, $this->keyCommands)) {
 			$args[1][0] = self::$defaultNamespace . $args[1][0];
 		}
 		try {
 			return parent::__call($name, $args[1]);
-		}
-		catch(RedisException $e) {
+		} catch (RedisException $e) {
 			return false;
 		}
 	}
 }
+
 ?>

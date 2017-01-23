@@ -1,12 +1,19 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongLi
+ * Date: 16/10/01
+ * Time: 11:28
+ * Email: liyong@addnewer.com
+ */
 
 namespace RedisQueue\ReQueue\Failure;
+
 /**
- * Interface that all failure backends should implement.
- *
- * @package		Resque/Failure
- * @author		Chris Boulton <chris@bigcommerce.com>
- * @license		http://www.opensource.org/licenses/mit-license.php
+ * Interface FailureInterface that all failure backends should implement.
+ * 
+ * @package RedisQueue\ReQueue\Failure
+ * @author yongli <liyong@addnewer.com>
  */
 interface FailureInterface
 {

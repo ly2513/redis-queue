@@ -1,18 +1,24 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongLi
+ * Date: 16/10/01
+ * Time: 11:28
+ * Email: liyong@addnewer.com
+ */
+
 namespace RedisQueue\ReQueue\Failure;
 
 use RedisQueue\ReQueue\Fail\FailureInterface;
 use stdClass;
-use RedisQueue\Resque;
+use RedisQueue\ResQueue;
 
 /**
- * Redis backend for storing failed Resque jobs.
+ * Class FailureRedis for storing failed ResQueue jobs.
  *
- * @package		Resque/Failure
- * @author		Chris Boulton <chris@bigcommerce.com>
- * @license		http://www.opensource.org/licenses/mit-license.php
+ * @package RedisQueue\ReQueue\Failure
+ * @author yongli  <liyong@addnewer.com>
  */
-
 class FailureRedis implements FailureInterface
 {
 	/**
@@ -26,7 +32,6 @@ class FailureRedis implements FailureInterface
 	public function __construct($payload, $exception, $worker, $queue)
 	{
 		$data = new stdClass;
-//		$data->failed_at = strftime('%a %b %d %H:%M:%S %Z %Y');
 		$data->failed_at = date('Y-m-d H:i:s',time());
 		$data->payload = $payload;
 		$data->exception = get_class($exception);
@@ -35,7 +40,7 @@ class FailureRedis implements FailureInterface
 		$data->worker = (string)$worker;
 		$data->queue = $queue;
 		$data = json_encode($data);
-		Resque::redis()->rpush('failed', $data);
+		ResQueue::redis()->rpush('failed', $data);
 	}
 }
 ?>
