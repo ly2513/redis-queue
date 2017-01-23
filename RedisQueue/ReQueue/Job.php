@@ -151,6 +151,7 @@ class Job
 
         $class = ucfirst($this->payload['class']);
         if (!class_exists($class)) {
+            echo $_SERVER['JOBPATH'] . $class . '.php';
             require $_SERVER['JOBPATH'] . $class . '.php';
         }
         if (!class_exists($class)) {

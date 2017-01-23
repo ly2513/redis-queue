@@ -25,10 +25,10 @@ $config['queue']['vverbose'] = 1;
 $config['queue']['count'] = 1;
 
 // 设置任务目录
-$config['queue']['jobPath'] = APPLICATION_ROOT . 'application/third_party/TradingMax/Job/';
+$config['queue']['jobPath'] = APPLICATION_ROOT . 'Job/';
 
 // 设置日志目录
-$config['queue']['logPath'] = APPLICATION_ROOT . 'public/material/log';
+$config['queue']['logPath'] = APPLICATION_ROOT . 'Log';
 
 
 // 设置如果失败将执行的次数
@@ -39,4 +39,4 @@ $config['queue']['pidfile'] = '';
 //$config['queue']['pidfile'] = '/var/run/resQueue.pid ';
 
 // 研发组邮箱,用英文半角分号隔开
-$config['queue']['emailGroup'] = 'liyong@addnewer.com,weimingcheng@addnewer.com,zhuxiaosong@addnewer.com';
+$config['queue']['emailGroup'] = 'liyong@addnewer.com';
