@@ -36,7 +36,6 @@ class WorkQueueCommand extends QueueCommand
             ->setDescription('work a queue.')
             ->setDefinition([
                 new InputOption(
-//                    'queue-name', null, InputOption::VALUE_NONE | InputOption::VALUE_IS_ARRAY,
                     'queue-name', null, InputOption::VALUE_NONE,
                     'queue name.'
                 ),
