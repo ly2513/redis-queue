@@ -1,7 +1,7 @@
 #RedisQueue目录
-   + [RedisQueue组件描述](#RedisQueue组件介绍)
-   + [ResQueue的目录结构](#ResQueue的目录结构)
-   + [ResQueue使用前期准备](#ResQueue使用前期准备)
+   + [RedisQueue组件描述](#user-content-redisQueue组件介绍)
+   + [ResQueue的目录结构](#user-content-resQueue的目录结构)
+   + [ResQueue使用前期准备](#user-content-resQueue使用前期准备)
 
 
 
