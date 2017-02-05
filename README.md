@@ -87,6 +87,21 @@ php artisan queue:work
 ```
 执行上面的创建命令,`redisQueue`会帮你创建默认的队列任务,默认的任务类为`default`。每个任务类中都有一个`perform`的方法,
 队列进程主要是执行任务类中的这个方法来完成相应的队列任务。
+
+```php
+    // 任务逻辑方法
+    public function perform()
+    {
+        $status = $this->email->sendEmail('测试队列发送邮件', ['liyong@addnewer.com'], 'RedisQueue');
+
+        if(!$status) {
+            $this->log->writeLog('发送失败');
+            echo false;
+        }
+    }
+```
+如有需要,可以自定义任务名称(即任务类名称)遵守驼峰命名。
+
 该命令有自己的一套默认参数,我们来瞧瞧这个命令的的相关参数吧。
 ```php
 # 这命令有这些参数
@@ -138,20 +153,6 @@ redis-port : 简写-rd,即queue:work --redis-port(-rp) 队列的redis的端口�
 
 ```
 至此组件的两个基本命令讲解到此为止,还有其他命令的讲解,陆续更新中ing。。。。
-
-```php
-    // 任务逻辑方法
-    public function perform()
-    {
-        $status = $this->email->sendEmail('测试队列发送邮件', ['liyong@addnewer.com'], 'RedisQueue');
-
-        if(!$status) {
-            $this->log->writeLog('发送失败');
-            echo false;
-        }
-    }
-```
-如有需要,可以自定义任务名称(即任务类名称)遵守驼峰命名。
 
 在使用该组件过程中如遇到问题请及时与我联系,QQ:`626375290`,微信:`liyong2007`.
 
