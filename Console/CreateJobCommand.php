@@ -15,12 +15,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Console\QueueCommand;
 use RedisQueue\ResQueue;
+use RedisQueue\ReQueue\Log;
 
 class CreateJobCommand extends QueueCommand
 {
+    private $log = null;
+
     public function __construct()
     {
         parent::__construct();
+        $this->log = new Log();
     }
 
     /**
@@ -42,7 +46,6 @@ class CreateJobCommand extends QueueCommand
                     'Describe the function of the queue.'
                 ),
                 new InputOption(
-//                    'queue-name', null, InputOption::VALUE_NONE | InputOption::VALUE_IS_ARRAY,
                     'queue-name', null, InputOption::VALUE_NONE,
                     'queue name.'
                 ),
@@ -87,49 +90,6 @@ class CreateJobCommand extends QueueCommand
         $payload = ['class' => 'sentEmail', 'data' => []];
         if (!$jobName) {
             $jobName = $payload['class'] ? $payload['class'] : 'default';
-//            $jobFile = $jobDir . ucfirst($jobName) . 'Job.php';
-//            is_file($jobFile) or touch($jobFile);
-//
-//            $str = <<<EOT
-//<?php
-///**
-//*
-//*
-//*/
-//namespace Job;
-//
-//use Tools\Email;
-//
-//class
-//EOT;
-//            $str .= ucfirst($jobName . 'Job') . PHP_EOL;
-//            $str .= <<<EOT
-//{
-//    protected \$email;
-//
-//    public function construct() {
-//        \$this->email = new EmailModel;
-//    }
-//
-//    /**
-//     * 运行任务
-//     *
-//     */
-//    public function perform()
-//    {
-//        sleep(120);
-//
-//        \$status = \$this->email->send('测试队列发送邮件', ['liyong@addnewer.com'], 'ResQueue');
-//        if(!\$status) {
-//            echo false;
-//        }
-//    }
-//
-//}
-//EOT;
-//
-//            file_put_contents($jobFile, $str);
-
             $description = 'Describe the function of the queue';
             //
             $args = [
@@ -143,15 +103,20 @@ class CreateJobCommand extends QueueCommand
             try {
                 // 队列ID
                 $jobId = ResQueue::enqueue($queueName, $jobName . 'Job', $args, true);
+                $this->log->writeLog('Create queue job success, the queue job id is ' . $jobId);
                 $output->writeln(sprintf('Create queue job success, the queue job id is "<info>%s</info>"', $jobId));
 
                 return true;
             } catch (InvalidArgumentException $e) {
-                $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"', $e->getMessage()));
+                $this->log->writeLog('Create queue job error, the error message is ' . $e->getMessage());
+                $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"',
+                    $e->getMessage()));
 
                 return false;
             } catch (Resque_Exception $e) {
-                $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"', $e->getMessage()));
+                $this->log->writeLog('Create queue job error, the error message is ' . $e->getMessage());
+                $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"',
+                    $e->getMessage()));
 
                 return false;
             }
@@ -160,7 +125,7 @@ class CreateJobCommand extends QueueCommand
         // 单独创建
         $jobName = 'default';
         $description = $input->getOption('job-describe');
-        $this->createJob($jobDir,$jobName,$description,$queueName,$output);
+        $this->createJob($jobDir, $jobName, $description, $queueName, $output);
     }
 
     /**
@@ -171,7 +136,7 @@ class CreateJobCommand extends QueueCommand
      * @param $queueName
      * @param $output
      */
-    private function createJob($jobDir, $jobName, $description, $queueName,$output)
+    private function createJob($jobDir, $jobName, $description, $queueName, $output)
     {
         $jobName = $jobName ? $jobName : 'default';
         $jobFile = $jobDir . ucfirst($jobName) . 'Job.php';
@@ -228,10 +193,12 @@ EOT;
             $jobId = ResQueue::enqueue($queueName, $jobName . 'Job', $args, true);
             $output->writeln(sprintf('Create queue job success, the queue job id is "<info>%s</info>"', $jobId));
         } catch (InvalidArgumentException $e) {
-            $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"', $e->getMessage()));
+            $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"',
+                $e->getMessage()));
 
         } catch (Resque_Exception $e) {
-            $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"', $e->getMessage()));
+            $output->writeln(sprintf('Create queue job error, the error message is "<info>%s</info>"',
+                $e->getMessage()));
         }
     }
 
