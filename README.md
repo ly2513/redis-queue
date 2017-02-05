@@ -1,11 +1,11 @@
 #RedisQueue目录
-   + [RedisQueue组件描述](#user-content-redisQueue组件介绍)
-   + [ResQueue的目录结构](#user-content-resQueue的目录结构)
-   + [ResQueue使用前期准备](#user-content-resQueue使用前期准备)
+   + [RedisQueue组件描述](#redisQueue1)
+   + [ResQueue的目录结构](#resQueue2)
+   + [ResQueue使用前期准备](#resQueue3)
 
 
 
-## RedisQueue组件介绍
+## <span id="redisQueue1"> RedisQueue组件介绍 </span>
 一个基于redis的队列项目，结合了symfony的console组件，采用命令创建队列、执行队列。
 **redisQueue**是一个流程相对简单(相对那些重量级的MQ),具有以下几个特点
 
@@ -19,7 +19,7 @@
 
 `redisQueue`队列库是基于redis队列实现的一套队列任务处理机制，同时提供了`Symfony`的`command`组件的队列命令.
 
-## ResQueue的目录结构
+## <span id="resQueue2"> ResQueue的目录结构 </span>
 
 ```
 ----redisQueue
@@ -47,7 +47,7 @@
     |____README.md  // RedisQueue组件说明文件
 
 ```
-## 使用前期准备
+## <span id="resQueue3"> 使用前期准备 </span>
 ### 使用`composer`安装组件
   + `symfony`的`console`命令组件
 
