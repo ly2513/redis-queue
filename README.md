@@ -88,7 +88,7 @@ php artisan queue:work
 执行上面的创建命令,`redisQueue`会帮你创建默认的队列任务,默认的任务类为`default`。每个任务类中都有一个`perform`的方法,
 队列进程主要是执行任务类中的这个方法来完成相应的队列任务。
 该命令有自己的一套默认参数,我们来瞧瞧这个命令的的相关参数吧。
-```sh
+```php
 # 这命令有这些参数
 queue:create [-j|--job-name JOB-NAME] [-d|--job-describe] [--queue-name] [-rh|--redis-host] [-rp|--redis-port]
 
