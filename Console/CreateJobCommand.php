@@ -90,7 +90,8 @@ class CreateJobCommand extends QueueCommand
         $payload = ['class' => 'sentEmail', 'data' => []];
         if (!$jobName) {
             $jobName = $payload['class'] ? $payload['class'] : 'default';
-            $description = 'Describe the function of the queue';
+            $description = $input->getOption('job-describe');
+            $description = $description ? $description : 'Describe the function of the queue';
             //
             $args = [
                 'time'  => time(),
