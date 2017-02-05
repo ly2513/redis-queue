@@ -11,9 +11,7 @@
 namespace RedisQueue\ReQueue;
 
 use RedisQueue\ReQueue\Failure\FailureInterface;
-//use RedisQueue\ReQueue\Worker;
 use RedisQueue\ReQueue\Failure\FailureRedis;
-//use Exception;
 
 
 /**

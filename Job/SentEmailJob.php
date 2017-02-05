@@ -1,30 +1,37 @@
 <?php 
 /**
-* 
+* 发送邮件任务
 *
 */
-namespace Job;
+
 
 use Tools\Email;
+use RedisQueue\ReQueue\Log;
 
 class SentEmailJob
 {
-protected $email;
+    private $email = null;
 
-/**
- * 运行任务
- *
- */
-public function perform()
-{
-    sleep(120);
-    
-    $this->email = new EmailModel;
+    private $log = null;
 
-    $status = $this->email->send('测试队列发送邮件', ['liyong@addnewer.com'], 'TradingMax');
-    if(!$status) {
-        echo false;
+    public function __construct() {
+        $this->email = new Email();
+        $this->log = new Log();
     }
-}
+
+    /**
+     * 运行任务
+     *
+     */
+    public function perform()
+    {
+//        sleep(120);
+        $status = $this->email->sendEmail('测试队列发送邮件', ['liyong@addnewer.com'], 'RedisQueue');
+
+        if(!$status) {
+            $this->log->writeLog('发送失败');
+            echo false;
+        }
+    }
 
 }

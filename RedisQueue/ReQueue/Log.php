@@ -7,7 +7,7 @@
  * Email: liyong@addnewer.com
  */
 
-namespace Queue\RedisQueue\ReQueue;
+namespace RedisQueue\ReQueue;
 
 class Log
 {
@@ -23,10 +23,10 @@ class Log
      */
     public function __construct()
     {
-        require APPLICATION_ROOT . 'application/config/queue.php';
+        require APPLICATION_ROOT . 'Config/queue.php';
         $this->logPath = $config['queue']['logPath'];
         is_dir($this->logPath) or mkdir($this->logPath, 0777, TRUE);
-        $this->logFile = $this->logPath . '/queue_'  .date('Y-m-d', time()) . '.log';
+        $this->logFile = $this->logPath . 'queue_'  .date('Y-m-d', time()) . '.log';
         is_file($this->logFile) or touch($this->logFile);
     }
 

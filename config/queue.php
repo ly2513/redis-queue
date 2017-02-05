@@ -28,7 +28,7 @@ $config['queue']['count'] = 1;
 $config['queue']['jobPath'] = APPLICATION_ROOT . 'Job/';
 
 // 设置日志目录
-$config['queue']['logPath'] = APPLICATION_ROOT . 'Log';
+$config['queue']['logPath'] = APPLICATION_ROOT . 'Log/';
 
 
 // 设置如果失败将执行的次数

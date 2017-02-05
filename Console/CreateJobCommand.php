@@ -87,46 +87,48 @@ class CreateJobCommand extends QueueCommand
         $payload = ['class' => 'sentEmail', 'data' => []];
         if (!$jobName) {
             $jobName = $payload['class'] ? $payload['class'] : 'default';
-            $jobFile = $jobDir . ucfirst($jobName) . 'Job.php';
-            is_file($jobFile) or touch($jobFile);
-
-            $str = <<<EOT
-<?php 
-/**
-* 
-*
-*/
-namespace Job;
-
-use Tools\Email;
-
-class 
-EOT;
-            $str .= ucfirst($jobName . 'Job') . PHP_EOL;
-            $str .= <<<EOT
-{
-protected \$email;
-
-/**
- * 运行任务
- *
- */
-public function perform()
-{
-    sleep(120);
-    
-    \$this->email = new EmailModel;
-
-    \$status = \$this->email->send('测试队列发送邮件', ['liyong@addnewer.com'], 'TradingMax');
-    if(!\$status) {
-        echo false;
-    }
-}
-
-}
-EOT;
-
-            file_put_contents($jobFile, $str);
+//            $jobFile = $jobDir . ucfirst($jobName) . 'Job.php';
+//            is_file($jobFile) or touch($jobFile);
+//
+//            $str = <<<EOT
+//<?php
+///**
+//*
+//*
+//*/
+//namespace Job;
+//
+//use Tools\Email;
+//
+//class
+//EOT;
+//            $str .= ucfirst($jobName . 'Job') . PHP_EOL;
+//            $str .= <<<EOT
+//{
+//    protected \$email;
+//
+//    public function construct() {
+//        \$this->email = new EmailModel;
+//    }
+//
+//    /**
+//     * 运行任务
+//     *
+//     */
+//    public function perform()
+//    {
+//        sleep(120);
+//
+//        \$status = \$this->email->send('测试队列发送邮件', ['liyong@addnewer.com'], 'ResQueue');
+//        if(!\$status) {
+//            echo false;
+//        }
+//    }
+//
+//}
+//EOT;
+//
+//            file_put_contents($jobFile, $str);
 
             $description = 'Describe the function of the queue';
             //

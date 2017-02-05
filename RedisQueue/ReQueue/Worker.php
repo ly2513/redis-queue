@@ -15,6 +15,7 @@ use RedisQueue\ReQueue\Event;
 use RedisQueue\ReQueue\Job;
 use RedisQueue\ReQueue\Job\Status;
 use RedisQueue\ReQueue\Job\DirtyExitException;
+use RedisQueue\ReQueue\Log;
 
 
 /**
@@ -61,7 +62,7 @@ class Worker
     private $id;
 
     /**
-     * @var resQueue_Job Current job, if any, being processed by this worker.
+     * @var reQueue_Job Current job, if any, being processed by this worker.
      */
     private $currentJob = null;
 
@@ -69,6 +70,13 @@ class Worker
      * @var int Process ID of child worker processes.
      */
     private $child = null;
+
+    /**
+     * a obj of log
+     * @var null
+     */
+    private $log = null;
+
 
     /**
      * Return all workers known to resQueue as instantiated instances.
@@ -156,6 +164,7 @@ class Worker
         }
         $this->hostname = $hostname;
         $this->id = $this->hostname . ':' . getmypid() . ':' . implode(',', $this->queues);
+        $this->log = new Log();
     }
 
     /**
@@ -198,7 +207,7 @@ class Worker
                 continue;
             }
 
-            $this->log('got ' . $job);
+            $this->log->writeLog('got' . $job);
             Event::trigger('beforeFork', $job);
             $this->workingOn($job);
 
@@ -208,6 +217,7 @@ class Worker
             if ($this->child === 0 || $this->child === false) {
                 $status = 'Processing ' . $job->queue . ' since ' . strftime('%F %T');
                 $this->updateProcLine($status);
+                $this->log->writeLog($status, self::LOG_VERBOSE);
                 $this->log($status, self::LOG_VERBOSE);
                 $this->perform($job);
                 if ($this->child === 0) {
@@ -219,6 +229,7 @@ class Worker
                 // Parent process, sit and wait
                 $status = 'Forked ' . $this->child . ' at ' . strftime('%F %T');
                 $this->updateProcLine($status);
+                $this->log->writeLog($status, self::LOG_VERBOSE);
                 $this->log($status, self::LOG_VERBOSE);
 
                 // Wait until the child process finishes before continuing
@@ -249,14 +260,16 @@ class Worker
             Event::trigger('afterFork', $job);
             $job->perform();
         } catch (Exception $e) {
-            $this->log($job . ' failed: ' . $e->getMessage());
+            $this->log->writeLog($job . ' failed: ' . $e->getMessage());
+            // $this->log($job . ' failed: ' . $e->getMessage());
             $job->fail($e);
 
             return;
         }
 
         $job->updateStatus(Status::STATUS_COMPLETE);
-        $this->log('done ' . $job);
+        $this->log->writeLog('done ' . $job);
+        // $this->log('done ' . $job);
     }
 
     /**
@@ -271,9 +284,11 @@ class Worker
             return;
         }
         foreach ($queues as $queue) {
+//            $this->log->writeLog('Checking ' . $queue, self::LOG_VERBOSE);
             $this->log('Checking ' . $queue, self::LOG_VERBOSE);
             $job = Job::reserve($queue);
             if ($job) {
+                $this->log->writeLog('Found job on ' . $queue, self::LOG_VERBOSE);
                 $this->log('Found job on ' . $queue, self::LOG_VERBOSE);
 
                 return $job;
@@ -375,6 +390,7 @@ class Worker
         pcntl_signal(SIGUSR2, [$this, 'pauseProcessing']);
         pcntl_signal(SIGCONT, [$this, 'unPauseProcessing']);
         pcntl_signal(SIGPIPE, [$this, 'reestablishRedisConnection']);
+        $this->log->writeLog('Registered signals', self::LOG_VERBOSE);
         $this->log('Registered signals', self::LOG_VERBOSE);
     }
 
@@ -383,6 +399,7 @@ class Worker
      */
     public function pauseProcessing()
     {
+        $this->log->writeLog('USR2 received; pausing job processing');
         $this->log('USR2 received; pausing job processing');
         $this->paused = true;
     }
@@ -393,6 +410,7 @@ class Worker
      */
     public function unPauseProcessing()
     {
+        $this->log->writeLog('CONT received; resuming job processing');
         $this->log('CONT received; resuming job processing');
         $this->paused = false;
     }
@@ -403,6 +421,7 @@ class Worker
      */
     public function reestablishRedisConnection()
     {
+        $this->log->writeLog('SIGPIPE received; attempting to reconnect');
         $this->log('SIGPIPE received; attempting to reconnect');
         ResQueue::redis()->establishConnection();
     }
@@ -414,6 +433,7 @@ class Worker
     public function shutdown()
     {
         $this->shutdown = true;
+        $this->log->writeLog('Exiting...');
         $this->log('Exiting...');
     }
 
@@ -434,17 +454,21 @@ class Worker
     public function killChild()
     {
         if (!$this->child) {
+            $this->log->writeLog('No child to kill.', self::LOG_VERBOSE);
             $this->log('No child to kill.', self::LOG_VERBOSE);
 
             return;
         }
 
+        $this->log->writeLog('Killing child at ' . $this->child, self::LOG_VERBOSE);
         $this->log('Killing child at ' . $this->child, self::LOG_VERBOSE);
         if (exec('ps -o pid,state -p ' . $this->child, $output, $returnCode) && $returnCode != 1) {
+            $this->log->writeLog('Killing child at ' . $this->child, self::LOG_VERBOSE);
             $this->log('Killing child at ' . $this->child, self::LOG_VERBOSE);
             posix_kill($this->child, SIGKILL);
             $this->child = null;
         } else {
+            $this->log->writeLog('Child ' . $this->child . ' not found, restarting.', self::LOG_VERBOSE);
             $this->log('Child ' . $this->child . ' not found, restarting.', self::LOG_VERBOSE);
             $this->shutdown();
         }
@@ -468,6 +492,7 @@ class Worker
                 if ($host != $this->hostname || in_array($pid, $workerPids) || $pid == getmypid()) {
                     continue;
                 }
+                $this->log->writeLog('Pruning dead worker: ' . (string)$worker, self::LOG_VERBOSE);
                 $this->log('Pruning dead worker: ' . (string)$worker, self::LOG_VERBOSE);
                 $worker->unregisterWorker();
             }
