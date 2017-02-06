@@ -98,6 +98,23 @@ class Job
     }
 
     /**
+     * Find the next available job from the specified queues using blocking list pop
+     * and return an instance of ResQueue_Job for it.
+     *
+     * @param array             $queues
+     * @param int               $timeout
+     * @return false|object Null when there aren't any waiting jobs, instance of Resque_Job when a job was found.
+     */
+    public static function reserveBlocking(array $queues, $timeout = null)
+    {
+        $item = ResQueue::blpop($queues, $timeout);
+        if(!is_array($item)) {
+            return false;
+        }
+        return new Job($item['queue'], $item['payload']);
+    }
+
+    /**
      * Update the status of the current job.
      *
      * @param int $status Status constant from redisQueue_Job_Status indicating the current status of a job.
