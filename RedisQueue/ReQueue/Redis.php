@@ -9,7 +9,7 @@
 
 namespace RedisQueue\ReQueue;
 
-use RedisQueue\RedisSent\Redisent;
+use RedisQueue\RedisSent\RedisSent;
 use RedisException;
 
 /**
@@ -29,7 +29,7 @@ use RedisException;
  * @package RedisQueue\ReQueue
  * @author yongli  <liyong@addnewer.com>
  */
-class Redis extends Redisent
+class Redis extends RedisSent
 {
 	
     /**

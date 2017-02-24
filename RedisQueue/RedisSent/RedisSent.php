@@ -17,9 +17,9 @@ use RedisException;
 define('CRLF', sprintf('%s%s', chr(13), chr(10)));
 
 /**
- * Redisent, a Redis interface for the modest among us
+ * RedisSent, a Redis interface for the modest among us
  */
-class Redisent
+class RedisSent
 {
 
     /**
@@ -44,7 +44,7 @@ class Redisent
     public $port;
 
     /**
-     * Creates a Redisent connection to the Redis server on host and port.
+     * Creates a RedisSent connection to the Redis server on host and port.
      * @param string  $host The hostname of the Redis server
      * @param integer $port The port number of the Redis server
      */

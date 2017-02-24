@@ -37,5 +37,20 @@
         + 如果阻塞模式未启用,`worker::work()`休眠间隔时间为秒,反复进行检查是否有待处理的队列任务;
         + 存储队列任务
             + `Worker::work()` 触发一个`beforeFork`事件;
-            + `Worker::work()`通过实例化一个Job对象作为参数调用`Worker->workingOn()`;
-            + 待续。。。
+            + `Worker::work()`通过实例化一个Job对象作为参数调用`Worker->workingOn()`处理新的任务;
+            + `Worker->workingOn()`进行跟踪任务相对应的work进程或者是与work进程之间的关系，然后从等待到运行更新任务的状态;
+            + `Worker->workingOn()`将新Job对象的有效载荷在给Work本身相关的Redis的关键（这是为了防止Job被丢失，在不依赖相对应的PID的时候），然后将结果返回给`Worker::work()`;
+            + `Worker::work()`接下来通过fork子进程来运行实际的`perform()`;
+            + 下一步就是不同的Work的子进程作为独立的进程运行;
+                + Work运行步骤
+                    + Work等待Job进程的完成;
+                    + 如果退出时状态不是0，Work会传入一个`Job_DirtyExitException`对象作为唯一的参数去调用`Job->fail()`;
+                    + `Job->fail()`触发`onFailure`事件(故障事件);
+                    + `Job->fail()`更新这个任务状态(从运行到失败这样的状态记录);
+                    + 同时`Job->fail()`通过任务的一些参数调用`Failure::create()`,从而通过work的ID和队列名称作为参数调用`Job_DirtyExitException`(抛出任务异常);
+                    + `Failure::create()`创建一个已经被`Failure "backend"`处理的任何类型的对象,默认情况下，`Failure_redis`的构造函数只是收集数据传递到`Failure::create`,然后推到失败的队列中;
+                    + `Job->fail()`会在redis中设置两个增量计数器：一个redis失败的总数，一个Work失败的总数;
+                    + `Job->fail()`返回控制给Work（此时Work程序仍在运行;
+                + Job运行步骤
+                    + 任务会通过`Job`实例作为唯一的参数去调用`Worker->perform()`
+                    + `Worker->perform()`设置一个`try…catch`模块可以适当的标记工作失败的异常处理（通过调用resque_job -> fail()，如上）

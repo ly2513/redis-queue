@@ -10,25 +10,25 @@
 
 namespace RedisQueue\RedisSent;
 
-use RedisQueue\RedisSent\Redisent;
+use RedisQueue\RedisSent\RedisSent;
 use Exception;
 
 
 /**
- * A generalized Redisent interface for a cluster of Redis servers
+ * A generalized RedisSent interface for a cluster of Redis servers
  */
-class RedisentCluster
+class RedisSentCluster
 {
 
 	/**
-	 * Collection of Redisent objects attached to Redis servers
+	 * Collection of RedisSent objects attached to Redis servers
 	 * @var array
 	 * @access private
 	 */
-	private $redisents = [];
+	private $redisSent = [];
 
 	/**
-	 * Aliases of Redisent objects attached to Redis servers, used to route commands to specific servers
+	 * Aliases of RedisSent objects attached to Redis servers, used to route commands to specific servers
 	 * @see RedisentCluster::to
 	 * @var array
 	 * @access private
@@ -78,7 +78,7 @@ class RedisentCluster
 	];
 
 	/**
-	 * Creates a Redisent interface to a cluster of Redis servers
+	 * Creates a RedisSent interface to a cluster of Redis servers
 	 * @param array $servers The Redis servers in the cluster. Each server should be in the format array('host' => hostname, 'port' => port)
 	 */
 	public function __construct($servers)
@@ -86,12 +86,12 @@ class RedisentCluster
 		$this->ring    = [];
 		$this->aliases = [];
 		foreach ($servers as $alias => $server) {
-			$this->redisents[] = new Redisent($server['host'], $server['port']);
+			$this->redisSent[] = new RedisSent($server['host'], $server['port']);
 			if (is_string($alias)) {
-				$this->aliases[$alias] = $this->redisents[count($this->redisents) - 1];
+				$this->aliases[$alias] = $this->redisSent[count($this->redisSent) - 1];
 			}
 			for ($replica = 1; $replica <= $this->replicas; $replica++) {
-				$this->ring[crc32($server['host'] . ':' . $server['port'] . '-' . $replica)] = $this->redisents[count($this->redisents) - 1];
+				$this->ring[crc32($server['host'] . ':' . $server['port'] . '-' . $replica)] = $this->redisSent[count($this->redisSent) - 1];
 			}
 		}
 		ksort($this->ring, SORT_NUMERIC);
@@ -101,7 +101,7 @@ class RedisentCluster
 	/**
 	 * Routes a command to a specific Redis server aliased by {$alias}.
 	 * @param $alias The alias of the Redis server
-	 * @return mixed The Redisent object attached to the Redis server
+	 * @return mixed The RedisSent object attached to the Redis server
 	 * @throws Exception
 	 */
 	public function to($alias)
@@ -109,7 +109,7 @@ class RedisentCluster
 		if (isset($this->aliases[$alias])) {
 			return $this->aliases[$alias];
 		} else {
-			throw new Exception("That Redisent alias does not exist");
+			throw new Exception("That RedisSent alias does not exist");
 		}
 	}
 
@@ -121,20 +121,20 @@ class RedisentCluster
 		$name = strtoupper($name);
 		if (!in_array($name, $this->dont_hash)) {
 			$node = $this->nextNode(crc32($args[0]));
-			$redisent = $this->ring[$node];
+			$redisSent = $this->ring[$node];
 		} else {
-			$redisent = $this->redisents[0];
+			$redisSent = $this->redisSent[0];
 		}
 
 		/* Execute the command on the server */
 
-		return call_user_func_array([$redisent, $name], $args);
+		return call_user_func_array([$redisSent, $name], $args);
 	}
 
 	/**
 	 * Routes to the proper server node
 	 * @param $needle
-	 * @return mixed The Redisent object associated with the hash
+	 * @return mixed The RedisSent object associated with the hash
 	 */
 	private function nextNode($needle)
 	{

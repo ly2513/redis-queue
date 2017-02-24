@@ -1,6 +1,5 @@
 <?php
 /**
- * Redisent, a Redis interface for the modest
  * Created by IntelliJ IDEA.
  * User: yongli
  * Date: 16/9/30

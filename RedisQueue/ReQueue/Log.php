@@ -11,10 +11,8 @@ namespace RedisQueue\ReQueue;
 
 class Log
 {
-    //public  $logPath = null;
     public  $logPath = NULL;
 
-    //public $logFile = null;
     const LOGFILE = NULL;
 
     /**

@@ -15,12 +15,12 @@ use RedisQueue\RedisSent\RedisentCluster;
 
 /**
  * Extended RedisCluster class used by redisQueue for all communication with
- * redis. Essentially adds namespace support to Redisent.
+ * redis. Essentially adds namespace support to RedisSent.
  *
  * @package RedisQueue\ReQueue
  * @author  yongLi <liyong@addnewer.com>
  */
-class RedisCluster extends RedisentCluster
+class RedisCluster extends RedisSentCluster
 {
 	/**
 	 * Redis namespace
