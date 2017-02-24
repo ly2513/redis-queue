@@ -6,11 +6,9 @@
  * Time: 11:28
  * Email: liyong@addnewer.com
  */
-
 namespace RedisQueue\ReQueue;
 
 use RedisQueue\ResQueue;
-
 
 /**
  * Class Stat redisQueue statistic management (jobs processed, failed, etc)
@@ -23,6 +21,7 @@ class Stat
      * Get the value of the supplied statistic counter for the specified statistic.
      *
      * @param string $stat The name of the statistic to get the stats for.
+     *
      * @return mixed Value of the statistic.
      */
     public static function get($stat)
@@ -34,7 +33,8 @@ class Stat
      * Increment the value of the specified statistic by a certain amount (default is 1)
      *
      * @param string $stat The name of the statistic to increment.
-     * @param int    $by The amount to increment the statistic by.
+     * @param int    $by   The amount to increment the statistic by.
+     *
      * @return boolean True if successful, false if not.
      */
     public static function incr($stat, $by = 1)
@@ -46,7 +46,8 @@ class Stat
      * Decrement the value of the specified statistic by a certain amount (default is 1)
      *
      * @param string $stat The name of the statistic to decrement.
-     * @param int    $by The amount to decrement the statistic by.
+     * @param int    $by   The amount to decrement the statistic by.
+     *
      * @return boolean True if successful, false if not.
      */
     public static function decr($stat, $by = 1)
@@ -58,6 +59,7 @@ class Stat
      * Delete a statistic with the given name.
      *
      * @param string $stat The name of the statistic to delete.
+     *
      * @return boolean True if successful, false if not.
      */
     public static function clear($stat)

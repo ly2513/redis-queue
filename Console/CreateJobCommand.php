@@ -66,9 +66,6 @@ class CreateJobCommand extends QueueCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // 获得工作任务
-//        $jobData = JobModel::select(['id', 'queue', 'payload'])->get()->toArray();
-
         $jobName = $input->getOption('job-name');
 
         $jobDir = $_SERVER['JOBPATH'];

@@ -3,28 +3,20 @@
 /**
  * 系统工具包,注意此工具包需要 Symfony2/Console、Doctrine2支持
  */
-define('APPLICATION_ROOT', dirname(__FILE__) .'/');
-
+define('APPLICATION_ROOT', dirname(__FILE__) . '/');
 // 设置时区
 date_default_timezone_set('PRC');
-
 // 环境变量
 define('ENVIRONMENT', 'prod');
-
 // 加载 Illuminate\Console
 require APPLICATION_ROOT . 'vendor/autoload.php';
-
 // 加载 TradingMax 命令行工具
 require APPLICATION_ROOT . '/autoload.php';
-
-
 // 加载app
 $app = new Symfony\Component\Console\Application('RedisQueue 命令行工具', 'v1.0(stable)');
 //echo '<pre>';print_r($app);die;
-$app->setCatchExceptions(TRUE);
+$app->setCatchExceptions(true);
 //$app->setHelperSet($helperSet);
-
-
 // 开始注册所需命令
 $artisans = [
     // 队列命令
@@ -33,8 +25,6 @@ $artisans = [
     // new \Console\ListenCommand(),
     new \Console\ListFailedCommand(),
 ];
-
 $app->addCommands($artisans);
 $app->run();
-
 exit(0);

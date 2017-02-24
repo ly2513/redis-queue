@@ -9,12 +9,10 @@
 if (!defined('APPLICATION_ROOT')) {
     die('Access Denied');
 }
-
 function do_queue_load($class)
 {
     if ($class) {
         $file = str_replace('\\', '/', $class);
-
         // 加载队列
         $queueFiles = APPLICATION_ROOT . $file . '.php';
         if (file_exists($queueFiles)) {

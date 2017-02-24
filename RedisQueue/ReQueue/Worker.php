@@ -6,9 +6,7 @@
  * Time: 10:28
  * Email: liyong@addnewer.com
  */
-
 namespace RedisQueue\ReQueue;
-
 use RedisQueue\ResQueue;
 use RedisQueue\ReQueue\Stat;
 use RedisQueue\ReQueue\Event;
@@ -16,7 +14,6 @@ use RedisQueue\ReQueue\Job;
 use RedisQueue\ReQueue\Job\Status;
 use RedisQueue\ReQueue\Job\DirtyExitException;
 use RedisQueue\ReQueue\Log;
-
 
 /**
  * Class Worker redisQueue worker that handles checking queues for jobs, fetching them
@@ -77,7 +74,6 @@ class Worker
      */
     private $log = null;
 
-
     /**
      * Return all workers known to resQueue as instantiated instances.
      * @return array
@@ -88,7 +84,6 @@ class Worker
         if (!is_array($workers)) {
             $workers = [];
         }
-
         $instances = [];
         foreach ($workers as $workerId) {
             $instances[] = self::find($workerId);
@@ -101,6 +96,7 @@ class Worker
      * Given a worker ID, check if it is registered/valid.
      *
      * @param string $workerId ID of the worker.
+     *
      * @return boolean True if the worker exists, false if not.
      */
     public static function exists($workerId)
@@ -112,6 +108,7 @@ class Worker
      * Given a worker ID, find it and return an instantiated worker class for it.
      *
      * @param string $workerId The ID of the worker.
+     *
      * @return resQueue_Worker Instance of the worker. False if the worker does not exist.
      */
     public static function find($workerId)
@@ -119,7 +116,6 @@ class Worker
         if (!self::exists($workerId) || false === strpos($workerId, ":")) {
             return false;
         }
-
         list($hostname, $pid, $queues) = explode(':', $workerId, 3);
         $queues = explode(',', $queues);
         $worker = new self($queues);
@@ -148,6 +144,7 @@ class Worker
      * this method.
      *
      * Worker constructor.
+     *
      * @param $queues String with a single queue name, array with multiple.
      */
     public function __construct($queues)
@@ -155,11 +152,9 @@ class Worker
         if (!is_array($queues)) {
             $queues = [$queues];
         }
-
-        $this->queues = $queues;
+        $this->queues   = $queues;
         $this->hostname = php_uname('n');
-
-        $this->id = $this->hostname . ':' . getmypid() . ':' . implode(',', $this->queues);
+        $this->id  = $this->hostname . ':' . getmypid() . ':' . implode(',', $this->queues);
         $this->log = new Log();
     }
 
@@ -175,18 +170,15 @@ class Worker
     {
         $this->updateProcLine('Starting');
         $this->startup();
-
         while (true) {
             if ($this->shutdown) {
                 break;
             }
-
             // Attempt to find and reserve a job
             $job = false;
             if (!$this->paused) {
                 $job = $this->reserve();
             }
-
             if (!$job) {
                 // For an interval of 0, break now - helps with unit testing etc
                 if ($interval == 0) {
@@ -202,13 +194,10 @@ class Worker
                 usleep($interval * 1000000);
                 continue;
             }
-
             $this->log->writeLog('got' . $job);
             Event::trigger('beforeFork', $job);
             $this->workingOn($job);
-
             $this->child = $this->fork();
-
             // Forked and we're the child. Run the job.
             if ($this->child === 0 || $this->child === false) {
                 $status = 'Processing ' . $job->queue . ' since ' . strftime('%F %T');
@@ -220,28 +209,22 @@ class Worker
                     exit(0);
                 }
             }
-
             if ($this->child > 0) {
                 // Parent process, sit and wait
                 $status = 'Forked ' . $this->child . ' at ' . strftime('%F %T');
                 $this->updateProcLine($status);
                 $this->log->writeLog($status, self::LOG_VERBOSE);
                 $this->log($status, self::LOG_VERBOSE);
-
                 // Wait until the child process finishes before continuing
                 pcntl_wait($status);
                 $exitStatus = pcntl_wexitstatus($status);
                 if ($exitStatus !== 0) {
-                    $job->fail(new DirtyExitException(
-                        'Job exited with exit code ' . $exitStatus
-                    ));
+                    $job->fail(new DirtyExitException('Job exited with exit code ' . $exitStatus));
                 }
             }
-
             $this->child = null;
             $this->doneWorking();
         }
-
         $this->unregisterWorker();
     }
 
@@ -262,7 +245,6 @@ class Worker
 
             return;
         }
-
         $job->updateStatus(Status::STATUS_COMPLETE);
         $this->log->writeLog('done ' . $job);
         // $this->log('done ' . $job);
@@ -280,7 +262,7 @@ class Worker
             return;
         }
         foreach ($queues as $queue) {
-//            $this->log->writeLog('Checking ' . $queue, self::LOG_VERBOSE);
+            //            $this->log->writeLog('Checking ' . $queue, self::LOG_VERBOSE);
             $this->log('Checking ' . $queue, self::LOG_VERBOSE);
             $job = Job::reserve($queue);
             if ($job) {
@@ -302,7 +284,8 @@ class Worker
      * alphabetic order. (@see $fetch)
      *
      * @param boolean $fetch If true, and the queue is set to *, will fetch
-     * all queue names from redis.
+     *                       all queue names from redis.
+     *
      * @return array Array of associated queues.
      */
     public function queues($fetch = true)
@@ -310,7 +293,6 @@ class Worker
         if (!in_array('*', $this->queues) || $fetch == false) {
             return $this->queues;
         }
-
         $queues = ResQueue::queues();
         sort($queues);
 
@@ -330,7 +312,6 @@ class Worker
         if (!function_exists('pcntl_fork')) {
             return false;
         }
-
         $pid = pcntl_fork();
         if ($pid === -1) {
             throw new RuntimeException('Unable to fork child worker.');
@@ -377,7 +358,6 @@ class Worker
         if (!function_exists('pcntl_signal')) {
             return;
         }
-
         declare(ticks = 1);
         pcntl_signal(SIGTERM, [$this, 'shutDownNow']);
         pcntl_signal(SIGINT, [$this, 'shutDownNow']);
@@ -455,7 +435,6 @@ class Worker
 
             return;
         }
-
         $this->log->writeLog('Killing child at ' . $this->child, self::LOG_VERBOSE);
         $this->log('Killing child at ' . $this->child, self::LOG_VERBOSE);
         if (exec('ps -o pid,state -p ' . $this->child, $output, $returnCode) && $returnCode != 1) {
@@ -481,7 +460,7 @@ class Worker
     public function pruneDeadWorkers()
     {
         $workerPids = $this->workerPids();
-        $workers = self::all();
+        $workers    = self::all();
         foreach ($workers as $worker) {
             if (is_object($worker)) {
                 list($host, $pid, $queues) = explode(':', (string)$worker, 3);
@@ -529,7 +508,6 @@ class Worker
         if (is_object($this->currentJob)) {
             $this->currentJob->fail(new DirtyExitException);
         }
-
         $id = (string)$this;
         ResQueue::redis()->srem('workers', $id);
         ResQueue::redis()->del('worker:' . $id);
@@ -545,7 +523,7 @@ class Worker
      */
     public function workingOn(Job $job)
     {
-        $job->worker = $this;
+        $job->worker      = $this;
         $this->currentJob = $job;
         $job->updateStatus(Status::STATUS_RUNNING);
         $data = json_encode([
@@ -613,6 +591,7 @@ class Worker
      * Get a statistic belonging to this worker.
      *
      * @param string $stat Statistic to fetch.
+     *
      * @return int Statistic value.
      */
     public function getStat($stat)

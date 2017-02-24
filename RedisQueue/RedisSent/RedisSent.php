@@ -7,11 +7,9 @@
  * Time: 下午1:04
  * Email: liyong@addnewer.com
  */
-
 namespace RedisQueue\RedisSent;
 
 use Exception;
-
 use RedisException;
 
 define('CRLF', sprintf('%s%s', chr(13), chr(10)));
@@ -45,6 +43,7 @@ class RedisSent
 
     /**
      * Creates a RedisSent connection to the Redis server on host and port.
+     *
      * @param string  $host The hostname of the Redis server
      * @param integer $port The port number of the Redis server
      */
@@ -74,7 +73,6 @@ class RedisSent
         array_unshift($args, strtoupper($name));
         $command = sprintf('*%d%s%s%s', count($args), CRLF, implode(array_map([$this, 'formatArgument'], $args), CRLF),
             CRLF);
-
         /* Open a Redis connection and execute the command */
         for ($written = 0; $written < strlen($command); $written += $fwrite) {
             $fwrite = fwrite($this->__sock, substr($command, $written));
@@ -82,7 +80,6 @@ class RedisSent
                 throw new Exception('Failed to write entire command to stream');
             }
         }
-
         /* Parse the response based on the reply identifier */
         $reply = trim(fgets($this->__sock, 512));
         switch (substr($reply, 0, 1)) {
@@ -118,11 +115,11 @@ class RedisSent
                 $response = [];
                 for ($i = 0; $i < $count; $i++) {
                     $bulk_head = trim(fgets($this->__sock, 512));
-                    $size = substr($bulk_head, 1);
+                    $size      = substr($bulk_head, 1);
                     if ($size == '-1') {
                         $response[] = null;
                     } else {
-                        $read = 0;
+                        $read  = 0;
                         $block = "";
                         do {
                             $block_size = ($size - $read) > 1024 ? 1024 : ($size - $read);
@@ -144,6 +141,7 @@ class RedisSent
         }
 
         /* Party on */
+
         return $response;
     }
 

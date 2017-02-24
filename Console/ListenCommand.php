@@ -94,14 +94,14 @@ class ListenCommand extends Command
     private function initConf()
     {
         require APPLICATION_ROOT . 'application/config/queue.php';
-        $_SERVER['QUEUE'] = $config['queue']['queue'];
-        $_SERVER['COUNT'] = $config['queue']['count'];
+        $_SERVER['QUEUE']         = $config['queue']['queue'];
+        $_SERVER['COUNT']         = $config['queue']['count'];
         $_SERVER['REDIS_BACKEND'] = $config['queue']['host'] . ':' . $config['queue']['port'];
-        $_SERVER['LOGGING'] = $config['queue']['logging'];
-        $_SERVER['VERBOSE'] = $config['queue']['verbose'];
-        $_SERVER['VVERBOSE'] = $config['queue']['vverbose'];
-        $_SERVER['INTERVAL'] = $config['queue']['sleep'];
-        $_SERVER['PIDFILE'] = $config['queue']['pidfile'];
+        $_SERVER['LOGGING']       = $config['queue']['logging'];
+        $_SERVER['VERBOSE']       = $config['queue']['verbose'];
+        $_SERVER['VVERBOSE']      = $config['queue']['vverbose'];
+        $_SERVER['INTERVAL']      = $config['queue']['sleep'];
+        $_SERVER['PIDFILE']       = $config['queue']['pidfile'];
     }
 
 }

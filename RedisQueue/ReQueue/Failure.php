@@ -6,12 +6,10 @@
  * Time: 下午1:04
  * Email: liyong@addnewer.com
  */
-
 namespace RedisQueue\ReQueue;
 
 use RedisQueue\ReQueue\Failure\FailureInterface;
 use RedisQueue\ReQueue\Failure\FailureRedis;
-
 
 /**
  * Failed ResQueue job.
@@ -29,9 +27,9 @@ class Failure
      * Create a new failed job on the backend.
      *
      * @param                            $payload   The contents of the job that has just failed.
-     * @param \Exception                  $exception The exception generated when the job failed to run.
-     * @param \RedisQueue\ReQueue\Worker $worker Instance of redisQueue_Worker that was running this job when it failed.
-     * @param                            $queue The name of the queue that this job was fetched from.
+     * @param \Exception                 $exception The exception generated when the job failed to run.
+     * @param \RedisQueue\ReQueue\Worker $worker    Instance of redisQueue_Worker that was running this job when it failed.
+     * @param                            $queue     The name of the queue that this job was fetched from.
      */
     public static function create($payload, \Exception $exception, \RedisQueue\ReQueue\Worker $worker, $queue)
     {
