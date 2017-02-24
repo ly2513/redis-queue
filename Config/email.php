@@ -27,4 +27,4 @@ $config['mail']['connectType'] = 'ssl';
 if (!$config['mail']['host'] || !$config['mail']['username'] || !$config['mail']['password']) {
     throw new Exception('The Email Is Not Config');
 }
-?>
+
