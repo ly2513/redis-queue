@@ -1,7 +1,7 @@
 #RedisQueue目录
    + [RedisQueue组件描述](#redisQueue1)
-   + [ResQueue的目录结构](#resQueue2)
-   + [ResQueue使用前期准备](#resQueue3)
+   + [RedisQueue的目录结构](#resQueue2)
+   + [RedisQueue使用前期准备](#resQueue3)
 
 
 
@@ -79,7 +79,7 @@ php artisan queue:failed
 php artisan queue:work
 ```
 
-##<span id="resQueue3"> ResQueue使用步骤 </span>
+##<span id="resQueue3"> RedisQueue使用步骤 </span>
 
 + 首先要知道怎么使用该组件创建队列,使用如下命令即可创建
 ```php

@@ -14,7 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Console\QueueCommand;
 use RedisQueue\ResQueue;
 
-//use TradingMax\Extend\EloquentAndQueue as initQueue;
 class ListFailedCommand extends QueueCommand
 {
     /**
