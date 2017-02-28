@@ -6,7 +6,6 @@
  * Time: 10:28
  * Email: liyong@addnewer.com
  */
-
 namespace RedisQueue;
 
 use RedisQueue\ReQueue\Job;
@@ -14,7 +13,6 @@ use RedisQueue\ReQueue\Event;
 use RedisQueue\ReQueue\Redis;
 use RedisQueue\ReQueue\RedisCluster;
 use RedisQueue\ReQueue\QueueException;
-
 
 /**
  * Class ResQueue
@@ -57,9 +55,9 @@ class ResQueue
      */
     public static function setBackend($server, $database = 0)
     {
-        self::$redisServer = $server;
+        self::$redisServer   = $server;
         self::$redisDatabase = $database;
-        self::$redis = null;
+        self::$redis         = null;
     }
 
     /**
@@ -74,18 +72,15 @@ class ResQueue
         $pid = getmypid();
         if (self::$pid !== $pid) {
             self::$redis = null;
-            self::$pid = $pid;
+            self::$pid   = $pid;
         }
-
         if (!is_null(self::$redis)) {
             return self::$redis;
         }
-
         $server = self::$redisServer;
         if (empty($server)) {
             $server = 'localhost:6379';
         }
-
         if (is_array($server)) {
             self::$redis = new RedisCluster($server);
         } else {
@@ -97,7 +92,6 @@ class ResQueue
             }
             self::$redis = new Redis($host, $port);
         }
-
         self::$redis->select(self::$redisDatabase);
 
         return self::$redis;
@@ -108,7 +102,7 @@ class ResQueue
      * exist, then create it as well.
      *
      * @param string $queue The name of the queue to add the job to.
-     * @param array  $item Job description as an array to be JSON encoded.
+     * @param array  $item  Job description as an array to be JSON encoded.
      */
     public static function push($queue, $item)
     {
@@ -121,6 +115,7 @@ class ResQueue
      * return it.
      *
      * @param string $queue The name of the queue to fetch an item from.
+     *
      * @return array Decoded item from the queue.
      */
     public static function pop($queue)
@@ -148,9 +143,9 @@ class ResQueue
     /**
      * Create a new job and save it to the specified queue.
      *
-     * @param string  $queue The name of the queue to place the job in.
-     * @param string  $class The name of the class that contains the code to execute the job.
-     * @param array   $args Any optional arguments that should be passed when the job is executed.
+     * @param string  $queue       The name of the queue to place the job in.
+     * @param string  $class       The name of the class that contains the code to execute the job.
+     * @param array   $args        Any optional arguments that should be passed when the job is executed.
      * @param boolean $trackStatus Set to true to be able to monitor the status of a job.
      *
      * @return string
@@ -173,6 +168,7 @@ class ResQueue
      * Reserve and return the next available job in the specified queue.
      *
      * @param string $queue Queue to fetch next available job from.
+     *
      * @return ResQueue_Job Instance of ResQueue_Job to be processed, false if none or error.
      */
     public static function reserve($queue)
