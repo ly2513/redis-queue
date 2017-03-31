@@ -1,5 +1,5 @@
 {
-    "name": "yongli/redis-queue",
+    "name": "yongli/redisQueue",
     "require": {
         "symfony/console": "^3.2",
         "phpmailer/phpmailer": "~5.2"
