@@ -8,8 +8,6 @@
  */
 namespace RedisQueue\ReQueue;
 
-use RedisQueue\ReQueue\Failure\FailureInterface;
-use RedisQueue\ReQueue\Failure\FailureRedis;
 
 /**
  * Failed ResQueue job.

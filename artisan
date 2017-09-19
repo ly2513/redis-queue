@@ -22,7 +22,7 @@ $artisans = [
     // 队列命令
     new \Console\CreateJobCommand(),
     new \Console\WorkQueueCommand(),
-    // new \Console\ListenCommand(),
+     new \Console\ListenCommand(),
     new \Console\ListFailedCommand(),
 ];
 $app->addCommands($artisans);

@@ -6,11 +6,9 @@
  * Time: 18:28
  * Email: liyong@addnewer.com
  */
-
 namespace RedisQueue\ReQueue\Job;
 
 use RedisQueue\ResQueue;
-
 
 /**
  * Class Status tracker/information for a job.
@@ -154,5 +152,3 @@ class Status
 		return 'job:' . $this->id . ':status';
 	}
 }
-
-?>

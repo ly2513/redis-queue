@@ -10,7 +10,8 @@
 namespace RedisQueue\ReQueue;
 
 /**
- * Class Event  redisQueue event/plugin system class
+ * Class Event redisQueue event/plugin system class
+ *
  * @package RedisQueue\ReQueue
  */
 class Event

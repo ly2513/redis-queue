@@ -7,13 +7,11 @@
  * Email: liyong@addnewer.com
  */
 namespace RedisQueue\ReQueue;
+
 use RedisQueue\ResQueue;
-use RedisQueue\ReQueue\Stat;
-use RedisQueue\ReQueue\Event;
 use RedisQueue\ReQueue\Job;
 use RedisQueue\ReQueue\Job\Status;
 use RedisQueue\ReQueue\Job\DirtyExitException;
-use RedisQueue\ReQueue\Log;
 
 /**
  * Class Worker redisQueue worker that handles checking queues for jobs, fetching them
@@ -341,7 +339,7 @@ class Worker
     private function updateProcLine($status)
     {
         if (function_exists('setproctitle')) {
-            setproctitle('resque-' . ResQueue::VERSION . ': ' . $status);
+            setproctitle('resqueue-' . ResQueue::VERSION . ': ' . $status);
         }
     }
 
@@ -482,13 +480,13 @@ class Worker
      */
     public function workerPids()
     {
-        $pids = [];
+        $pidArr = [];
         exec('ps -A -o pid,command | grep [r]esque', $cmdOutput);
         foreach ($cmdOutput as $line) {
-            list($pids[],) = explode(' ', trim($line), 2);
+            list($pidArr[],) = explode(' ', trim($line), 2);
         }
 
-        return $pids;
+        return $pidArr;
     }
 
     /**
@@ -600,4 +598,3 @@ class Worker
     }
 }
 
-?>

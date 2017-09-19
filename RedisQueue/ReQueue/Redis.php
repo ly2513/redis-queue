@@ -16,16 +16,8 @@ use RedisException;
  * Extended Redisent class used by ResQueue for all communication with
  * redis. Essentially adds namespace support to Redisent.
  *
- * @package		ResQueue/Redis
- * @author		Chris Boulton <chris@bigcommerce.com>
- * @license		http://www.opensource.org/licenses/mit-license.php
- */
-
-/**
- * Extended Redisent class used by ResQueue for all communication with
- * redis. Essentially adds namespace support to Redisent.
- *
  * Class Redis
+ *
  * @package RedisQueue\ReQueue
  * @author yongli  <liyong@addnewer.com>
  */
@@ -132,4 +124,3 @@ class Redis extends RedisSent
 		}
 	}
 }
-?>

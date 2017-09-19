@@ -7,6 +7,7 @@
  * Email: liyong@addnewer.com
  */
 namespace RedisQueue\ReQueue;
+
 use RedisException;
 use RedisQueue\RedisSent\RedisentCluster;
 
@@ -121,4 +122,3 @@ class RedisCluster extends RedisSentCluster
     }
 }
 
-?>

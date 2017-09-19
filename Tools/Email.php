@@ -6,10 +6,15 @@
  * Time: 16:01
  * Email: liyong@addnewer.com
  */
-
 namespace Tools;
 
-class Email {
+/**
+ * Class Email
+ *
+ * @package Tools
+ */
+class Email
+{
     /**
      * 邮件对象
      *
@@ -42,18 +47,16 @@ class Email {
     {
         //循环处理用户
         $this->email->clearAddresses();
-
         foreach ($user as $val) {
             $this->email->addAddress($val);
         }
-
         $this->email->Subject = $title;
         $this->email->Body    = $message;
-
         try {
-            return $this->email->send() ? TRUE : FALSE;
+            return $this->email->send() ? true : false;
         } catch (Exception $e) {
             $this->email->errorInfo = $e->getMessage();
+
             return $e->getMessage();
         }
     }
@@ -66,7 +69,7 @@ class Email {
         require APPLICATION_ROOT . 'Config/email.php';
         $this->email = new \PHPmailer();
         $this->email->isSMTP();
-        $this->email->SMTPAuth   = TRUE;
+        $this->email->SMTPAuth   = true;
         $this->email->SMTPSecure = $config['mail']['connectType'];
         $this->email->Host       = $config['mail']['host'];
         $this->email->Username   = $config['mail']['username'];
@@ -78,7 +81,7 @@ class Email {
         //回复邮件设置
         $this->email->From      = $config['mail']['username'];
         $this->email->FromName  = $config['mail']['name'];
-        $this->email->errorInfo = NULL;
+        $this->email->errorInfo = null;
     }
 
     /**

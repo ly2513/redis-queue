@@ -19,6 +19,11 @@ Event::listen('beforePerform', ['MyQueuePlugin', 'beforePerform']);
 Event::listen('afterPerform', ['MyQueuePlugin', 'afterPerform']);
 Event::listen('onFailure', ['MyQueuePlugin', 'onFailure']);
 
+/**
+ * Class MyQueuePlugin
+ *
+ * @package RedisQueue\Extras
+ */
 class MyQueuePlugin
 {
     public static function afterEnqueue($class, $arguments)

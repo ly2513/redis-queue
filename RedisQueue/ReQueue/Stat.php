@@ -12,6 +12,7 @@ use RedisQueue\ResQueue;
 
 /**
  * Class Stat redisQueue statistic management (jobs processed, failed, etc)
+ *
  * @package RedisQueue\ReQueue
  * @author  yongli <liyong@addnewer.com>
  */
@@ -67,5 +68,3 @@ class Stat
         return (bool)ResQueue::redis()->del('stat:' . $stat);
     }
 }
-
-?>

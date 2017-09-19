@@ -8,7 +8,6 @@
  */
 namespace RedisQueue\ReQueue\Failure;
 
-use RedisQueue\ReQueue\Failure\FailureInterface;
 use stdClass;
 use RedisQueue\ResQueue;
 

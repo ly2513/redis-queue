@@ -15,7 +15,9 @@ use RedisException;
 define('CRLF', sprintf('%s%s', chr(13), chr(10)));
 
 /**
- * RedisSent, a Redis interface for the modest among us
+ * Class RedisSent a Redis interface for the modest among us
+ *
+ * @package RedisQueue\RedisSent
  */
 class RedisSent
 {
@@ -69,29 +71,29 @@ class RedisSent
 
     public function __call($name, $args)
     {
-        /* Build the Redis unified protocol command */
+        // Build the Redis unified protocol command
         array_unshift($args, strtoupper($name));
         $command = sprintf('*%d%s%s%s', count($args), CRLF, implode(array_map([$this, 'formatArgument'], $args), CRLF),
             CRLF);
-        /* Open a Redis connection and execute the command */
+        // Open a Redis connection and execute the command
         for ($written = 0; $written < strlen($command); $written += $fwrite) {
             $fwrite = fwrite($this->__sock, substr($command, $written));
             if ($fwrite === false) {
                 throw new Exception('Failed to write entire command to stream');
             }
         }
-        /* Parse the response based on the reply identifier */
+        // Parse the response based on the reply identifier
         $reply = trim(fgets($this->__sock, 512));
         switch (substr($reply, 0, 1)) {
-            /* Error reply */
+            // Error reply
             case '-':
                 throw new RedisException(substr(trim($reply), 4));
                 break;
-            /* Inline reply */
+            // Inline reply
             case '+':
                 $response = substr(trim($reply), 1);
                 break;
-            /* Bulk reply */
+            // Bulk reply
             case '$':
                 $response = null;
                 if ($reply == '$-1') {
@@ -104,9 +106,9 @@ class RedisSent
                     $response .= fread($this->__sock, $block_size);
                     $read += $block_size;
                 } while ($read < $size);
-                fread($this->__sock, 2); /* discard crlf */
+                fread($this->__sock, 2); // discard crlf
                 break;
-            /* Multi-bulk reply */
+            // Multi-bulk reply
             case '*':
                 $count = substr($reply, 1);
                 if ($count == '-1') {
@@ -131,7 +133,7 @@ class RedisSent
                     }
                 }
                 break;
-            /* Integer reply */
+            // Integer reply
             case ':':
                 $response = intval(substr(trim($reply), 1));
                 break;
@@ -140,8 +142,7 @@ class RedisSent
                 break;
         }
 
-        /* Party on */
-
+        // Party on
         return $response;
     }
 

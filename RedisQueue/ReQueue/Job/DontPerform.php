@@ -6,7 +6,6 @@
  * Time: 10:28
  * Email: liyong@addnewer.com
  */
-
 namespace RedisQueue\ReQueue\Job;
 
 use Exception;

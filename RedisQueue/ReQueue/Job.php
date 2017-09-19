@@ -1,19 +1,23 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: yongLi
+ * Date: 16/10/01
+ * Time: 11:28
+ * Email: liyong@addnewer.com
+ */
 namespace RedisQueue\ReQueue;
 
 use RedisQueue\ReQueue\Job\Status;
 use RedisQueue\ReQueue\Job\DontPerform;
-use RedisQueue\ReQueue\Failure;
-use RedisQueue\ReQueue\Event;
 use RedisQueue\ResQueue;
 use InvalidArgumentException;
-use RedisQueue\ReQueue\QueueException;
-
 
 /**
- * Class Job redisQueue job.
+ * Class Job
+ *
  * @package RedisQueue\ReQueue
- * @author yongli <liyong@addnewer.com>
+ * @author  yongli <liyong@addnewer.com>
  */
 class Job
 {
@@ -40,21 +44,21 @@ class Job
     /**
      * Instantiate a new instance of a job.
      *
-     * @param string $queue The queue that the job belongs to.
+     * @param string $queue   The queue that the job belongs to.
      * @param array  $payload array containing details of the job.
      */
     public function __construct($queue, $payload)
     {
-        $this->queue = $queue;
+        $this->queue   = $queue;
         $this->payload = $payload;
     }
 
     /**
      * Create a new job and save it to the specified queue.
      *
-     * @param string  $queue The name of the queue to place the job in.
-     * @param string  $class The name of the class that contains the code to execute the job.
-     * @param array   $args Any optional arguments that should be passed when the job is executed.
+     * @param string  $queue   The name of the queue to place the job in.
+     * @param string  $class   The name of the class that contains the code to execute the job.
+     * @param array   $args    Any optional arguments that should be passed when the job is executed.
      * @param boolean $monitor Set to true to be able to monitor the status of a job.
      *
      * @return string
@@ -62,9 +66,7 @@ class Job
     public static function create($queue, $class, $args = null, $monitor = false)
     {
         if ($args !== null && !is_array($args)) {
-            throw new InvalidArgumentException(
-                'Supplied $args must be an array.'
-            );
+            throw new InvalidArgumentException('Supplied $args must be an array.');
         }
         $id = md5(uniqid('', true));
         ResQueue::push($queue, [
@@ -72,7 +74,6 @@ class Job
             'args'  => [$args],
             'id'    => $id,
         ]);
-
         if ($monitor) {
             Status::create($id);
         }
@@ -85,6 +86,7 @@ class Job
      * instance of Job for it.
      *
      * @param string $queue The name of the queue to check for a job in.
+     *
      * @return null|object Null when there aren't any waiting jobs, instance of ResQueue_Job when a job was found.
      */
     public static function reserve($queue)
@@ -101,16 +103,18 @@ class Job
      * Find the next available job from the specified queues using blocking list pop
      * and return an instance of ResQueue_Job for it.
      *
-     * @param array             $queues
-     * @param int               $timeout
+     * @param array $queues
+     * @param int   $timeout
+     *
      * @return false|object Null when there aren't any waiting jobs, instance of Resque_Job when a job was found.
      */
     public static function reserveBlocking(array $queues, $timeout = null)
     {
         $item = ResQueue::blpop($queues, $timeout);
-        if(!is_array($item)) {
+        if (!is_array($item)) {
             return false;
         }
+
         return new Job($item['queue'], $item['payload']);
     }
 
@@ -124,7 +128,6 @@ class Job
         if (empty($this->payload['id'])) {
             return;
         }
-
         $statusInstance = new Status($this->payload['id']);
         $statusInstance->update($status);
     }
@@ -165,27 +168,19 @@ class Job
         if (!is_null($this->instance)) {
             return $this->instance;
         }
-
         $class = ucfirst($this->payload['class']);
-
         if (!class_exists($class)) {
             require $_SERVER['JOBPATH'] . $class . '.php';
         }
         if (!class_exists($class)) {
-            throw new QueueException(
-                'Could not find job class ' . $class . '.'
-            );
+            throw new QueueException('Could not find job class ' . $class . '.');
         }
-
         if (!method_exists($class, 'perform')) {
-            throw new QueueException(
-                'Job class ' . $class . ' does not contain a perform method.'
-            );
+            throw new QueueException('Job class ' . $class . ' does not contain a perform method.');
         }
-
-        $this->instance = new $class();
-        $this->instance->job = $this;
-        $this->instance->args = $this->getArguments();
+        $this->instance        = new $class();
+        $this->instance->job   = $this;
+        $this->instance->args  = $this->getArguments();
         $this->instance->queue = $this->queue;
 
         return $this->instance;
@@ -203,17 +198,13 @@ class Job
         $instance = $this->getInstance();
         try {
             Event::trigger('beforePerform', $this);
-
             if (method_exists($instance, 'setUp')) {
                 $instance->setUp();
             }
-
             $instance->perform();
-
             if (method_exists($instance, 'tearDown')) {
                 $instance->tearDown();
             }
-
             Event::trigger('afterPerform', $this);
         } // beforePerform/setUp have said don't perform this job. Return.
         catch (DontPerform $e) {
@@ -234,14 +225,8 @@ class Job
             'exception' => $exception,
             'job'       => $this,
         ]);
-
         $this->updateStatus(Status::STATUS_FAILED);
-        Failure::create(
-            $this->payload,
-            $exception,
-            $this->worker,
-            $this->queue
-        );
+        Failure::create($this->payload, $exception, $this->worker, $this->queue);
         Stat::incr('failed');
         Stat::incr('failed:' . $this->worker);
     }
@@ -252,7 +237,7 @@ class Job
      */
     public function recreate()
     {
-        $status = new Status($this->payload['id']);
+        $status  = new Status($this->payload['id']);
         $monitor = false;
         if ($status->isTracking()) {
             $monitor = true;
@@ -283,4 +268,3 @@ class Job
     }
 }
 
-?>
