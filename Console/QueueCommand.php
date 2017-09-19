@@ -6,7 +6,6 @@
  * Time: 下午1:04
  * Email: liyong@addnewer.com
  */
-
 namespace Console;
 
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +16,6 @@ class QueueCommand extends Command
     public function __construct()
     {
         parent::__construct();
-
         // init Queue
         $this->initQueueConf();
     }

@@ -8,12 +8,9 @@
  */
 namespace Console;
 
-
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Console\QueueCommand;
 use RedisQueue\ResQueue;
 use RedisQueue\ReQueue\Log;
 
@@ -33,30 +30,12 @@ class CreateJobCommand extends QueueCommand
      */
     protected function configure()
     {
-        $this
-            ->setName('queue:create')
-            ->setDescription('Create a queue job with the redis.')
-            ->setDefinition([
-                new InputOption(
-                    'job-name', 'j', InputOption::VALUE_REQUIRED,
-                    'Create a queue job name.'
-                ),
-                new InputOption(
-                    'job-describe', 'd', InputOption::VALUE_NONE,
-                    'Describe the function of the queue.'
-                ),
-                new InputOption(
-                    'queue-name', null, InputOption::VALUE_NONE,
-                    'queue name.'
-                ),
-                new InputOption(
-                    'redis-host', 'rh', InputOption::VALUE_NONE,
-                    'Redis service host.'
-                ),
-                new InputOption(
-                    'redis-port', 'rp', InputOption::VALUE_NONE,
-                    'Redis service port.'
-                ),
+        $this->setName('queue:create')->setDescription('Create a queue job with the redis.')->setDefinition([
+                new InputOption('job-name', 'j', InputOption::VALUE_REQUIRED, 'Create a queue job name.'),
+                new InputOption('job-describe', 'd', InputOption::VALUE_NONE, 'Describe the function of the queue.'),
+                new InputOption('queue-name', null, InputOption::VALUE_NONE, 'queue name.'),
+                new InputOption('redis-host', 'rh', InputOption::VALUE_NONE, 'Redis service host.'),
+                new InputOption('redis-port', 'rp', InputOption::VALUE_NONE, 'Redis service port.'),
             ]);
     }
 
@@ -67,26 +46,20 @@ class CreateJobCommand extends QueueCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $jobName = $input->getOption('job-name');
-
         $jobDir = $_SERVER['JOBPATH'];
-
         is_dir($jobDir) or mkdir($jobDir, 0777, true);
-
-        $host = $input->getOption('redis-host');
-        $port = $input->getOption('redis-port');
-        $host = $host ? $host : '127.0.0.1';
-        $port = $port ? $port : 6379;
+        $host        = $input->getOption('redis-host');
+        $port        = $input->getOption('redis-port');
+        $host        = $host ? $host : '127.0.0.1';
+        $port        = $port ? $port : 6379;
         $redisServer = $host . ':' . $port;
-
         $redisBackEnd = $_SERVER['REDIS_BACKEND'];
-
         $redisBackEnd ? ResQueue::setBackend($redisBackEnd) : ResQueue::setBackend($redisServer);
-
         $queueName = $input->getOption('queue-name');
         $queueName = $queueName ? $queueName : 'default';
-        $payload = ['class' => 'sentEmail', 'data' => []];
+        $payload   = ['class' => 'sentEmail', 'data' => []];
         if (!$jobName) {
-            $jobName = $payload['class'] ? $payload['class'] : 'default';
+            $jobName     = $payload['class'] ? $payload['class'] : 'default';
             $description = $input->getOption('job-describe');
             $description = $description ? $description : 'Describe the function of the queue';
             //
@@ -97,7 +70,6 @@ class CreateJobCommand extends QueueCommand
                 ],
             ];
             $args = $payload['data'] ? $payload['data'] : $args;
-
             try {
                 // 队列ID
                 $jobId = ResQueue::enqueue($queueName, $jobName . 'Job', $args, true);
@@ -119,15 +91,15 @@ class CreateJobCommand extends QueueCommand
                 return false;
             }
         }
-
         // 单独创建
-        $jobName = 'default';
+        $jobName     = 'default';
         $description = $input->getOption('job-describe');
         $this->createJob($jobDir, $jobName, $description, $queueName, $output);
     }
 
     /**
      * 创建任务
+     *
      * @param $jobDir
      * @param $jobName
      * @param $description
@@ -174,9 +146,7 @@ EOT;
     
 }
 EOT;
-
         file_put_contents($jobFile, $str);
-
         $description = $description ? $description : 'Describe the function of the queue';
         //
         $args = [
@@ -185,7 +155,6 @@ EOT;
                 'test' => $description,
             ],
         ];
-
         try {
             // 队列ID
             $jobId = ResQueue::enqueue($queueName, $jobName . 'Job', $args, true);
@@ -199,7 +168,6 @@ EOT;
                 $e->getMessage()));
         }
     }
-
 
 }
 

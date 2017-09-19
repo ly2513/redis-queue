@@ -45,7 +45,7 @@ class Failure
     public static function getBackend()
     {
         if (self::$backend === null) {
-            self::$backend = 'FailureRedis';
+            self::$backend = "\\RedisQueue\\ReQueue\\Failure\\FailureRedis";
         }
 
         return self::$backend;
