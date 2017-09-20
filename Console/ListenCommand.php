@@ -43,7 +43,6 @@ class ListenCommand extends QueueCommand
         $work = new Worker();
         $pids = $work->workerPids('default');
         print_r($pids);
-        
 //        echo '<pre>';
 //        print_r($a);
 //        $jobId = $input->getOption('job-id');
