@@ -152,8 +152,8 @@ class Worker
         }
         $this->queues   = $queues;
         $this->hostname = php_uname('n');
-        $this->id  = $this->hostname . ':' . getmypid() . ':' . implode(',', $this->queues);
-        $this->log = new Log();
+        $this->id       = $this->hostname . ':' . getmypid() . ':' . implode(',', $this->queues);
+        $this->log      = new Log();
     }
 
     /**

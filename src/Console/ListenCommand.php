@@ -37,12 +37,14 @@ class ListenCommand extends QueueCommand
     {
 //       $a =  system('ps aux | grep php');
 //       $a =  system('ps -ef | grep php');
+        
 //       exec('ps aux | egrep php',$a,$b);
 //        var_dump($a);
 //        var_dump($b);
-        $work = new Worker();
-        $pids = $work->workerPids('default');
-        print_r($pids);
+//        $works = Worker::all();
+
+//        $pids = $work->workerPids('default');
+//        print_r($works);
 //        echo '<pre>';
 //        print_r($a);
 //        $jobId = $input->getOption('job-id');

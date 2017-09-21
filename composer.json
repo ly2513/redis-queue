@@ -1,13 +1,21 @@
 {
-    "name": "yongli/redisQueue",
-    "require": {
-        "symfony/console": "^3.2",
-        "phpmailer/phpmailer": "~5.2"
-    },
+    "name": "ly2513/ypphp-page-redis-queue",
+    "description": "Display page edis-queue",
+    "keywords": ["ypphp","queue"],
+    "homepage": "https://github.com/ly2513/redis-queue",
+    "license": "MIT",
     "authors": [
         {
-            "name": "liyong",
-            "email": "ly626375290@gmail.com"
+            "name": "gaofeng",
+            "email": "626375290@qq.com",
+            "homepage": "https://www.liyongweb.com",
+            "role": "Developer"
         }
-    ]
+    ],
+    "require": {
+        "php": "^5.3.3 || ^7.0"
+    },
+    "autoload": {
+        "psr-4": { "Loading\\": "" }
+    }
 }
