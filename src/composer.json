@@ -14,9 +14,8 @@
     ],
     "require": {
         "php": "^5.3.3 || ^7.0",
-        "symfony/console": "^3.2",
-        "league/oauth2-google": "*",
-        "phpmailer/phpmailer": "*"
+        "symfony/console": "~2.0",
+        "phpmailer/phpmailer": "5.2.*"
     },
     "autoload": {
         "psr-4": { "Loading\\": "" }

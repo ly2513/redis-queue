@@ -11,9 +11,9 @@ $config['mail']['host'] = 'smtp.exmail.qq.com';
 // 邮箱服务器端口
 $config['mail']['port'] = '465';
 // 账户(需配置)
-$config['mail']['username'] = '';
+$config['mail']['username'] = 'noreply@addnewer.com';
 // 密码(需配置)
-$config['mail']['password'] = '';
+$config['mail']['password'] = 'nWaybb74rLYm';
 // 账户名称,主要显示
 $config['mail']['name'] = 'ResQueue';
 // 加密方式

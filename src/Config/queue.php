@@ -19,13 +19,13 @@ $config['queue']['vverbose'] = 1;
 // 设定 worker 数量
 $config['queue']['count'] = 1;
 // 设置任务目录
-$config['queue']['jobPath'] = APPLICATION_ROOT . 'Job/';
+$config['queue']['jobPath'] = APPLICATION_ROOT . '/Job/';
 // 设置日志目录
-$config['queue']['logPath'] = APPLICATION_ROOT . 'Log/';
+$config['queue']['logPath'] = APPLICATION_ROOT . '/Log/';
 // 设置如果失败将执行的次数
 $config['queue']['executionTimes'] = 3;
 // 如果你是简单 worker,可以指定 PIDFILE 把pid写入
 $config['queue']['pidfile'] = '';
 //$config['queue']['pidfile'] = '/var/run/resQueue.pid ';
 // 研发组邮箱,用英文半角分号隔开
-$config['queue']['emailGroup'] = 'liyong@addnewer.com';
+$config['queue']['emailGroup'] = '626375290@qq.com';
