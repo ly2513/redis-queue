@@ -22,7 +22,7 @@
 ## <span id="resQueue2"> ResQueue的目录结构 </span>
 
 ```
-----redisQueue
+----src
     |---- Config  // 相关配置目录
     |       |---- email.php
     |       |____ queue.php
