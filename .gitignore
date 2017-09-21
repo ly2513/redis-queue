@@ -1,11 +1,12 @@
 .idea
 
-/vendor/
+/src/vendor/*
+vendor/*
 
 composer.lock
 
-Job/*
+/src/Job/*
 
-Log/*
+/src/Log/*
 
-Config/email.php
+/src/Config/email.php
