@@ -1,5 +1,5 @@
 {
-    "name": "ly2513/ypphp-page-redis-queue",
+    "name": "ly2513/redis-queue",
     "description": "Display page edis-queue",
     "keywords": ["ypphp","queue"],
     "homepage": "https://github.com/ly2513/redis-queue",
