@@ -15,8 +15,11 @@ function do_queue_load($class)
         $file = str_replace('\\', '/', $class);
         // 加载队列
         $queueFiles = APPLICATION_ROOT . $file . '.php';
+
         if (file_exists($queueFiles)) {
             require $queueFiles;
+        }else{
+//            require dirname(__DIR__).'/vendor/autoload.php';
         }
     }
 }

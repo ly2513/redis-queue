@@ -5,6 +5,8 @@
  */
 define('APPLICATION_ROOT', dirname(__FILE__) . '/src/');
 
+define('VENDOR', dirname(__FILE__) . '/vendor/');
+
 // 设置时区
 date_default_timezone_set('PRC');
 
@@ -12,7 +14,7 @@ date_default_timezone_set('PRC');
 define('ENVIRONMENT', 'prod');
 
 // 加载 Illuminate\Console
-require APPLICATION_ROOT . 'vendor/autoload.php';
+require VENDOR . 'autoload.php';
 
 // 加载 redis-queue组件
 require APPLICATION_ROOT . '/autoload.php';
@@ -21,6 +23,7 @@ require APPLICATION_ROOT . '/autoload.php';
 $app = new Symfony\Component\Console\Application('RedisQueue 命令行工具', 'v1.0(stable)');
 $app->setCatchExceptions(true);
 //$app->setHelperSet($helperSet);
+
 // 开始注册所需命令
 $artisans = [
     // 队列命令

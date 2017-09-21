@@ -112,6 +112,6 @@ class Email
      */
     private function loadMailer()
     {
-        require_once APPLICATION_ROOT . 'vendor/phpmailer/phpmailer/PHPMailerAutoload.php';
+        require_once VENDOR . 'phpmailer/phpmailer/PHPMailerAutoload.php';
     }
 }
