@@ -8,5 +8,3 @@ composer.lock
 /src/Job/*
 
 /src/Log/*
-
-/src/Config/email.php
