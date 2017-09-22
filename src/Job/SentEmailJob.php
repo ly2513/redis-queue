@@ -1,10 +1,8 @@
-<?php 
+<?php
 /**
-* 发送邮件任务
-*
-*/
-
-
+ * 发送邮件任务
+ *
+ */
 use Tools\Email;
 use RedisQueue\ReQueue\Log;
 
@@ -14,9 +12,10 @@ class SentEmailJob
 
     private $log = null;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->email = new Email();
-        $this->log = new Log();
+        $this->log   = new Log();
     }
 
     /**
@@ -32,5 +31,4 @@ class SentEmailJob
             echo false;
         }
     }
-
 }

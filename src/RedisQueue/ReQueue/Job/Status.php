@@ -18,137 +18,132 @@ use RedisQueue\ResQueue;
  */
 class Status
 {
-	const STATUS_WAITING  = 1;
-	const STATUS_RUNNING  = 2;
-	const STATUS_FAILED   = 3;
-	const STATUS_COMPLETE = 4;
+    const STATUS_WAITING  = 1;
+    const STATUS_RUNNING  = 2;
+    const STATUS_FAILED   = 3;
+    const STATUS_COMPLETE = 4;
 
-	/**
-	 * @var string The ID of the job this status class refers back to.
-	 */
-	private $id;
+    /**
+     * @var string The ID of the job this status class refers back to.
+     */
+    private $id;
 
-	/**
-	 * @var mixed Cache variable if the status of this job is being monitored or not.
-	 *    True/false when checked at least once or null if not checked yet.
-	 */
-	private $isTracking = null;
+    /**
+     * @var mixed Cache variable if the status of this job is being monitored or not.
+     *    True/false when checked at least once or null if not checked yet.
+     */
+    private $isTracking = null;
 
-	/**
-	 * @var array Array of statuses that are considered final/complete.
-	 */
-	private static $completeStatuses = [
-		self::STATUS_FAILED,
-		self::STATUS_COMPLETE
-	];
+    /**
+     * @var array Array of statuses that are considered final/complete.
+     */
+    private static $completeStatuses = [
+        self::STATUS_FAILED,
+        self::STATUS_COMPLETE
+    ];
 
-	/**
-	 * Setup a new instance of the job monitor class for the supplied job ID.
-	 *
-	 * @param string $id The ID of the job to manage the status for.
-	 */
-	public function __construct($id)
-	{
-		$this->id = $id;
-	}
+    /**
+     * Setup a new instance of the job monitor class for the supplied job ID.
+     *
+     * @param string $id The ID of the job to manage the status for.
+     */
+    public function __construct($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Create a new status monitor item for the supplied job ID. Will create
-	 * all necessary keys in Redis to monitor the status of a job.
-	 *
-	 * @param string $id The ID of the job to monitor the status of.
-	 */
-	public static function create($id)
-	{
-		$statusPacket = [
-			'status'  => self::STATUS_WAITING,
-			'updated' => time(),
-			'started' => time(),
-		];
-		ResQueue::redis()->set('job:' . $id . ':status', json_encode($statusPacket));
-	}
+    /**
+     * Create a new status monitor item for the supplied job ID. Will create
+     * all necessary keys in Redis to monitor the status of a job.
+     *
+     * @param string $id The ID of the job to monitor the status of.
+     */
+    public static function create($id)
+    {
+        $statusPacket = [
+            'status'  => self::STATUS_WAITING,
+            'updated' => time(),
+            'started' => time(),
+        ];
+        ResQueue::redis()->set('job:' . $id . ':status', json_encode($statusPacket));
+    }
 
-	/**
-	 * Check if we're actually checking the status of the loaded job status
-	 * instance.
-	 *
-	 * @return boolean True if the status is being monitored, false if not.
-	 */
-	public function isTracking()
-	{
-		if ($this->isTracking === false) {
-			return false;
-		}
+    /**
+     * Check if we're actually checking the status of the loaded job status
+     * instance.
+     *
+     * @return boolean True if the status is being monitored, false if not.
+     */
+    public function isTracking()
+    {
+        if ($this->isTracking === false) {
+            return false;
+        }
+        if (!ResQueue::redis()->exists((string)$this)) {
+            $this->isTracking = false;
 
-		if (!ResQueue::redis()->exists((string)$this)) {
-			$this->isTracking = false;
+            return false;
+        }
+        $this->isTracking = true;
 
-			return false;
-		}
+        return true;
+    }
 
-		$this->isTracking = true;
+    /**
+     * Update the status indicator for the current job with a new status.
+     *
+     * @param int The status of the job (see constants in ResQueue_Job_Status)
+     */
+    public function update($status)
+    {
+        if (!$this->isTracking()) {
+            return;
+        }
+        $statusPacket = [
+            'status'  => $status,
+            'updated' => time(),
+        ];
+        ResQueue::redis()->set((string)$this, json_encode($statusPacket));
+        // Expire the status for completed jobs after 24 hours
+        if (in_array($status, self::$completeStatuses)) {
+            ResQueue::redis()->expire((string)$this, 86400);
+        }
+    }
 
-		return true;
-	}
+    /**
+     * Fetch the status for the job being monitored.
+     *
+     * @return mixed False if the status is not being monitored, otherwise the status as
+     *    as an integer, based on the ResQueue_Job_Status constants.
+     */
+    public function get()
+    {
+        if (!$this->isTracking()) {
+            return false;
+        }
+        $statusPacket = json_decode(ResQueue::redis()->get((string)$this), true);
+        if (!$statusPacket) {
+            return false;
+        }
 
-	/**
-	 * Update the status indicator for the current job with a new status.
-	 *
-	 * @param int The status of the job (see constants in ResQueue_Job_Status)
-	 */
-	public function update($status)
-	{
-		if (!$this->isTracking()) {
-			return;
-		}
+        return $statusPacket['status'];
+    }
 
-		$statusPacket = [
-			'status'  => $status,
-			'updated' => time(),
-		];
-		ResQueue::redis()->set((string)$this, json_encode($statusPacket));
+    /**
+     * Stop tracking the status of a job.
+     */
+    public function stop()
+    {
+        ResQueue::redis()->del((string)$this);
+    }
 
-		// Expire the status for completed jobs after 24 hours
-		if (in_array($status, self::$completeStatuses)) {
-			ResQueue::redis()->expire((string)$this, 86400);
-		}
-	}
-
-	/**
-	 * Fetch the status for the job being monitored.
-	 *
-	 * @return mixed False if the status is not being monitored, otherwise the status as
-	 *    as an integer, based on the ResQueue_Job_Status constants.
-	 */
-	public function get()
-	{
-		if (!$this->isTracking()) {
-			return false;
-		}
-
-		$statusPacket = json_decode(ResQueue::redis()->get((string)$this), true);
-		if (!$statusPacket) {
-			return false;
-		}
-
-		return $statusPacket['status'];
-	}
-
-	/**
-	 * Stop tracking the status of a job.
-	 */
-	public function stop()
-	{
-		ResQueue::redis()->del((string)$this);
-	}
-
-	/**
-	 * Generate a string representation of this object.
-	 *
-	 * @return string String representation of the current job status class.
-	 */
-	public function __toString()
-	{
-		return 'job:' . $this->id . ':status';
-	}
+    /**
+     * Generate a string representation of this object.
+     *
+     * @return string String representation of the current job status class.
+     */
+    public function __toString()
+    {
+        return 'job:' . $this->id . ':status';
+    }
 }

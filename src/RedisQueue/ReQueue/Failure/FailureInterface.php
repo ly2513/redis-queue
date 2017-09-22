@@ -26,5 +26,3 @@ interface FailureInterface
      */
     public function __construct($payload, $exception, $worker, $queue);
 }
-
-?>

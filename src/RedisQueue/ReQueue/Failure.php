@@ -8,7 +8,6 @@
  */
 namespace RedisQueue\ReQueue;
 
-
 /**
  * Failed ResQueue job.
  *

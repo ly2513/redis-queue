@@ -267,4 +267,3 @@ class Job
         return '(' . implode(' | ', $name) . ')';
     }
 }
-

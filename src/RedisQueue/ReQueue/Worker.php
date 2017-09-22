@@ -597,4 +597,3 @@ class Worker
         return Stat::get($stat . ':' . $this);
     }
 }
-

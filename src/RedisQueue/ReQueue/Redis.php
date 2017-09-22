@@ -6,7 +6,6 @@
  * Time: 11:28
  * Email: liyong@addnewer.com
  */
-
 namespace RedisQueue\ReQueue;
 
 use RedisQueue\RedisSent\RedisSent;
@@ -19,22 +18,22 @@ use RedisException;
  * Class Redis
  *
  * @package RedisQueue\ReQueue
- * @author yongli  <liyong@addnewer.com>
+ * @author  yongli  <liyong@addnewer.com>
  */
 class Redis extends RedisSent
 {
-	
-    /**
-     * Redis namespace
-     * @var string
-     */
-    private static $defaultNamespace = 'resQueue:';
+
+	/**
+	 * Redis namespace
+	 * @var string
+	 */
+	private static $defaultNamespace = 'resQueue:';
 
 	/**
 	 * @var array List of all commands in Redis that supply a key as their
-	 *	first argument. Used to prefix keys with the resQueue namespace.
+	 *    first argument. Used to prefix keys with the resQueue namespace.
 	 */
-	private $keyCommands = array(
+	private $keyCommands = [
 		'exists',
 		'del',
 		'type',
@@ -76,7 +75,7 @@ class Redis extends RedisSent
 		'zscore',
 		'zremrangebyscore',
 		'sort'
-	);
+	];
 	// sinterstore
 	// sunion
 	// sunionstore
@@ -90,36 +89,37 @@ class Redis extends RedisSent
 	// msetnx
 	// mset
 	// renamenx
-	
 	/**
 	 * Set Redis namespace (prefix) default: resQueue
+	 *
 	 * @param string $namespace
 	 */
 	public static function prefix($namespace)
 	{
-	    if (strpos($namespace, ':') === false) {
-	        $namespace .= ':';
-	    }
-	    self::$defaultNamespace = $namespace;
+		if (strpos($namespace, ':') === false) {
+			$namespace .= ':';
+		}
+		self::$defaultNamespace = $namespace;
 	}
-	
+
 	/**
 	 * Magic method to handle all function requests and prefix key based
 	 * operations with the {self::$defaultNamespace} key prefix.
 	 *
 	 * @param string $name The name of the method called.
-	 * @param array $args Array of supplied arguments to the method.
+	 * @param array  $args Array of supplied arguments to the method.
+	 *
 	 * @return mixed Return value from Resident::call() based on the command.
 	 */
-	public function __call($name, $args) {
+	public function __call($name, $args)
+	{
 		$args = func_get_args();
-		if(in_array($name, $this->keyCommands)) {
-		    $args[1][0] = self::$defaultNamespace . $args[1][0];
+		if (in_array($name, $this->keyCommands)) {
+			$args[1][0] = self::$defaultNamespace . $args[1][0];
 		}
 		try {
 			return parent::__call($name, $args[1]);
-		}
-		catch(RedisException $e) {
+		} catch (RedisException $e) {
 			return false;
 		}
 	}

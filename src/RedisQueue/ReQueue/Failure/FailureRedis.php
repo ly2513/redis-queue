@@ -41,5 +41,3 @@ class FailureRedis implements FailureInterface
         ResQueue::redis()->rpush('failed', $data);
     }
 }
-
-?>

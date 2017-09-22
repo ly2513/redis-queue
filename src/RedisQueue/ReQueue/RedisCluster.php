@@ -121,4 +121,3 @@ class RedisCluster extends RedisSentCluster
         }
     }
 }
-

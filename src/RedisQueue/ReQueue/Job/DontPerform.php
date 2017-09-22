@@ -10,7 +10,6 @@ namespace RedisQueue\ReQueue\Job;
 
 use Exception;
 
-
 /**
  * Class DontPerform Exception to be thrown if a job should not be performed/run.
  *
