@@ -7,7 +7,7 @@
  * Email: liyong@addnewer.com
  */
 namespace Tools;
-
+use Con\Email as ConfigEmail ;
 /**
  * Class Email
  *
@@ -31,7 +31,6 @@ class Email
     {
         $this->loadMailer();
         $this->initEmial();
-
     }
 
     /**
@@ -66,21 +65,20 @@ class Email
      */
     private function initEmial()
     {
-        require APPLICATION_ROOT . 'Config/email.php';
         $this->email = new \PHPmailer();
         $this->email->isSMTP();
         $this->email->SMTPAuth   = true;
-        $this->email->SMTPSecure = $config['mail']['connectType'];
-        $this->email->Host       = $config['mail']['host'];
-        $this->email->Username   = $config['mail']['username'];
-        $this->email->Password   = $config['mail']['password'];
-        $this->email->Port       = $config['mail']['port'];
-        $this->email->CharSet    = $config['mail']['charset'];
-        $this->email->isHTML     = $config['mail']['isHTML'];
-        $this->email->AltBody    = $config['mail']['AltBody'];
+        $this->email->SMTPSecure = ConfigEmail::$connectType;
+        $this->email->Host       = ConfigEmail::$host;
+        $this->email->Username   = ConfigEmail::$username;
+        $this->email->Password   = ConfigEmail::$password;
+        $this->email->Port       = ConfigEmail::$port;
+        $this->email->CharSet    = ConfigEmail::$charset;
+        $this->email->isHTML     = ConfigEmail::$isHTML;
+        $this->email->AltBody    = ConfigEmail::$altBody;
         //回复邮件设置
-        $this->email->From      = $config['mail']['username'];
-        $this->email->FromName  = $config['mail']['name'];
+        $this->email->From      = ConfigEmail::$username;
+        $this->email->FromName  = ConfigEmail::$name;
         $this->email->errorInfo = null;
     }
 
@@ -112,6 +110,6 @@ class Email
      */
     private function loadMailer()
     {
-        require_once VENDOR . 'phpmailer/phpmailer/PHPMailerAutoload.php';
+        require_once VENDOR_PATH . 'phpmailer/phpmailer/PHPMailerAutoload.php';
     }
 }

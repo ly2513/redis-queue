@@ -7,6 +7,7 @@
  * Email: liyong@addnewer.com
  */
 namespace RedisQueue\ReQueue;
+use Con\Queue;
 
 class Log
 {
@@ -20,8 +21,7 @@ class Log
      */
     public function __construct()
     {
-        require APPLICATION_ROOT . 'Config/queue.php';
-        $this->logPath = $config['queue']['logPath'];
+        $this->logPath = Queue::$logPath;
         is_dir($this->logPath) or mkdir($this->logPath, 0777, true);
         $this->logFile = $this->logPath . 'queue_' . date('Y-m-d', time()) . '.log';
         is_file($this->logFile) or touch($this->logFile);
@@ -37,12 +37,10 @@ class Log
     {
         if ($logLevel == 1) {
             file_put_contents($this->logFile, $message, FILE_APPEND);
-            //fwrite(STDOUT, "*** " . $message . "\n");
         }
         if ($logLevel == 2) {
             $message = '[' . date('Y-m-d H:i:s', time()) . ']' . $message . PHP_EOL;
             file_put_contents($this->logFile, $message, FILE_APPEND);
-            //fwrite(STDOUT, "** [" . strftime('%T %Y-%m-%d') . "] " . $message . "\n");
         }
 
     }

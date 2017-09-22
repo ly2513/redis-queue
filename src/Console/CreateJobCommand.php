@@ -14,10 +14,25 @@ use Symfony\Component\Console\Output\OutputInterface;
 use RedisQueue\ResQueue;
 use RedisQueue\ReQueue\Log;
 
+/**
+ * 创建队列任务
+ *
+ * Class CreateJobCommand
+ *
+ * @package Console
+ */
 class CreateJobCommand extends QueueCommand
 {
+    /**
+     * 日志对象
+     *
+     * @var null|Log
+     */
     private $log = null;
 
+    /**
+     * CreateJobCommand constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -26,33 +41,36 @@ class CreateJobCommand extends QueueCommand
 
     /**
      * 命令配置
-     * {@inheritdoc}
      */
     protected function configure()
     {
         $this->setName('queue:create')->setDescription('Create a queue job with the redis.')->setDefinition([
-                new InputOption('job-name', 'j', InputOption::VALUE_REQUIRED, 'Create a queue job name.'),
-                new InputOption('job-describe', 'd', InputOption::VALUE_NONE, 'Describe the function of the queue.'),
-                new InputOption('queue-name', null, InputOption::VALUE_NONE, 'queue name.'),
-                new InputOption('redis-host', 'rh', InputOption::VALUE_NONE, 'Redis service host.'),
-                new InputOption('redis-port', 'rp', InputOption::VALUE_NONE, 'Redis service port.'),
-            ]);
+            new InputOption('job-name', 'j', InputOption::VALUE_REQUIRED, 'Create a queue job name.'),
+            new InputOption('job-describe', 'd', InputOption::VALUE_NONE, 'Describe the function of the queue.'),
+            new InputOption('queue-name', null, InputOption::VALUE_NONE, 'queue name.'),
+            new InputOption('redis-host', 'rh', InputOption::VALUE_NONE, 'Redis service host.'),
+            new InputOption('redis-port', 'rp', InputOption::VALUE_NONE, 'Redis service port.'),
+        ]);
     }
 
     /**
      * 命令操作
-     * {@inheritdoc}
+     *
+     * @param InputInterface  $input  命令的输入
+     * @param OutputInterface $output 命令的输出
+     *
+     * @return bool
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $jobName = $input->getOption('job-name');
-        $jobDir = $_SERVER['JOBPATH'];
+        $jobDir  = $_SERVER['JOBPATH'];
         is_dir($jobDir) or mkdir($jobDir, 0777, true);
-        $host        = $input->getOption('redis-host');
-        $port        = $input->getOption('redis-port');
-        $host        = $host ? $host : '127.0.0.1';
-        $port        = $port ? $port : 6379;
-        $redisServer = $host . ':' . $port;
+        $host         = $input->getOption('redis-host');
+        $port         = $input->getOption('redis-port');
+        $host         = $host ? $host : '127.0.0.1';
+        $port         = $port ? $port : 6379;
+        $redisServer  = $host . ':' . $port;
         $redisBackEnd = $_SERVER['REDIS_BACKEND'];
         $redisBackEnd ? ResQueue::setBackend($redisBackEnd) : ResQueue::setBackend($redisServer);
         $queueName = $input->getOption('queue-name');
@@ -94,19 +112,19 @@ class CreateJobCommand extends QueueCommand
         // 单独创建
         $jobName     = 'default';
         $description = $input->getOption('job-describe');
-        $this->createJob($jobDir, $jobName, $description, $queueName, $output);
+        $this->_createJob($jobDir, $jobName, $description, $queueName, $output);
     }
 
     /**
      * 创建任务
      *
-     * @param $jobDir
-     * @param $jobName
-     * @param $description
-     * @param $queueName
-     * @param $output
+     * @param $jobDir      队列任务的目录
+     * @param $jobName     队列任务
+     * @param $description 描述
+     * @param $queueName   队列名称
+     * @param $output      输出
      */
-    private function createJob($jobDir, $jobName, $description, $queueName, $output)
+    private function _createJob($jobDir, $jobName, $description, $queueName, $output)
     {
         $jobName = $jobName ? $jobName : 'default';
         $jobFile = $jobDir . ucfirst($jobName) . 'Job.php';

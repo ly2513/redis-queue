@@ -3,9 +3,18 @@
 /**
  * 系统工具包,注意此工具包需要 Symfony2/Console、Doctrine2支持
  */
-define('APPLICATION_ROOT', dirname(__FILE__) . '/src/');
+// 项目根目录
+define('ROOT_PATH', rtrim(__DIR__, '/') . DIRECTORY_SEPARATOR);
 
-define('VENDOR', dirname(__FILE__) . '/vendor/');
+
+// 队列组件目录
+define('LIB_PATH', rtrim(dirname(__FILE__) . '/src', '/') . DIRECTORY_SEPARATOR);
+
+// 依赖组件目录
+define('VENDOR_PATH', rtrim(dirname(__FILE__) . '/vendor', '/') . DIRECTORY_SEPARATOR);
+
+// 定义应用的命名空间
+define('APP_NAMESPACE', 'Queue');
 
 // 设置时区
 date_default_timezone_set('PRC');
@@ -14,10 +23,10 @@ date_default_timezone_set('PRC');
 define('ENVIRONMENT', 'prod');
 
 // 加载 Illuminate\Console
-require VENDOR . 'autoload.php';
+require VENDOR_PATH . 'autoload.php';
 
 // 加载 redis-queue组件
-require APPLICATION_ROOT . '/autoload.php';
+require LIB_PATH . '/autoload.php';
 
 // 加载 app
 $app = new Symfony\Component\Console\Application('RedisQueue 命令行工具', 'v1.0(stable)');

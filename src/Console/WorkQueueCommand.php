@@ -14,8 +14,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 use RedisQueue\ResQueue;
 use RedisQueue\ReQueue\Worker;
 
+/**
+ * Class WorkQueueCommand
+ *
+ * @package Console
+ */
 class WorkQueueCommand extends QueueCommand
 {
+    /**
+     * WorkQueueCommand constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -23,44 +31,46 @@ class WorkQueueCommand extends QueueCommand
 
     /**
      * 命令配置
-     * {@inheritdoc}
      */
     protected function configure()
     {
         $this->setName('queue:work')->setDescription('work a queue.')->setDefinition([
-                new InputOption('queue-name', null, InputOption::VALUE_NONE, 'queue name.'),
-                new InputOption('redis-host', 'rh', InputOption::VALUE_NONE, 'Redis service host.'),
-                new InputOption('redis-port', 'rp', InputOption::VALUE_NONE, 'Redis service port.'),
-            ]);
+            new InputOption('queue-name', null, InputOption::VALUE_NONE, 'queue name.'),
+            new InputOption('redis-host', 'rh', InputOption::VALUE_NONE, 'Redis service host.'),
+            new InputOption('redis-port', 'rp', InputOption::VALUE_NONE, 'Redis service port.'),
+        ]);
     }
 
     /**
      * 命令操作
-     * {@inheritdoc}
+     *
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return bool
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $host        = $input->getOption('redis-host');
-        $port        = $input->getOption('redis-port');
-        $host        = $host ? $host : '127.0.0.1';
-        $port        = $port ? $port : 6379;
-        $redisServer = $host . ':' . $port;
-        //        $this->initConf();
+        $host         = $input->getOption('redis-host');
+        $port         = $input->getOption('redis-port');
+        $host         = $host ? $host : '127.0.0.1';
+        $port         = $port ? $port : 6379;
+        $redisServer  = $host . ':' . $port;
         $redisBackEnd = $_SERVER['REDIS_BACKEND'];
         $redisBackEnd ? ResQueue::setBackend($redisBackEnd) : ResQueue::setBackend($redisServer);
         $queueName = $input->getOption('queue-name');
-        $queue = $queueName ? $queueName : $_SERVER['QUEUE'];
+        $queue     = $queueName ? $queueName : $_SERVER['QUEUE'];
         if (empty($queue)) {
             die("Set QUEUE env var containing the list of queues to work.\n");
         }
-        $logLevel = 0;
-        $logging  = $_SERVER['LOGGING'];
-        $verbose  = $_SERVER['VERBOSE'];
-        $vverbose = $_SERVER['VVERBOSE'];
+        $logLevel   = 0;
+        $logging    = $_SERVER['LOGGING'];
+        $verbose    = $_SERVER['VERBOSE'];
+        $v_ver_bose = $_SERVER['VVERBOSE'];
         // 设置调试log的相关信息
         if (!empty($logging) || !empty($verbose)) {
             $logLevel = Worker::LOG_NORMAL;
-        } else if (!empty($vverbose)) {
+        } else if (!empty($v_ver_bose)) {
             $logLevel = Worker::LOG_VERBOSE;
         }
         // 加载所有的job类
@@ -90,16 +100,20 @@ class WorkQueueCommand extends QueueCommand
                     break;
                 }
             }
+
+            return true;
         } else { // 开启一个简单的worker进程
             $queues           = explode(',', $queue);
             $worker           = new Worker($queues);
             $worker->logLevel = $logLevel;
-            $pidFile = $_SERVER['PIDFILE'];
+            $pidFile          = $_SERVER['PIDFILE'];
             if ($pidFile) {
                 file_put_contents($pidFile, getmypid()) or die('Could not write PID information to ' . $pidFile);
             }
             $output->writeln(sprintf('*** Starting worker "<info>%s</info>"', $worker));
             $worker->work($interval);
+
+            return true;
         }
     }
 

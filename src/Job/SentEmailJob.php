@@ -25,10 +25,15 @@ class SentEmailJob
     public function perform()
     {
         //        sleep(120);
-        $status = $this->email->sendEmail('测试队列发送邮件', ['626375290@qq.com'], 'RedisQueue');
-        if (!$status) {
-            $this->log->writeLog('发送失败');
-            echo false;
+
+        try{
+            $status = $this->email->sendEmail('测试队列发送邮件', ['626375290@qq.com'], 'RedisQueue');
+        }catch (Exception $e){
+            $this->log->writeLog($e->getMessage());
         }
+//        if (!$status) {
+//            $this->log->writeLog('发送失败');
+//            echo false;
+//        }
     }
 }
