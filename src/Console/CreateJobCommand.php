@@ -75,7 +75,7 @@ class CreateJobCommand extends QueueCommand
         $redisBackEnd ? ResQueue::setBackend($redisBackEnd) : ResQueue::setBackend($redisServer);
         $queueName = $input->getOption('queue-name');
         $queueName = $queueName ? $queueName : 'default';
-        $payload   = ['class' => 'sentEmail', 'data' => []];
+        $payload   = ['class' => 'Job\sentEmail', 'data' => []];
         if (!$jobName) {
             $jobName     = $payload['class'] ? $payload['class'] : 'default';
             $description = $input->getOption('job-describe');
@@ -135,9 +135,9 @@ class CreateJobCommand extends QueueCommand
  * 
  *
  */
- namespace TradingMax\Job;
+ namespace Job;
  
- use TradingMax\Model\EmailModel;
+ use Tools\Email;
  
 class 
 EOT;
@@ -154,7 +154,7 @@ EOT;
     {
         sleep(120);
         
-        \$this->email = new EmailModel;
+        \$this->email = new Email();
 
         \$status = \$this->email->send('测试队列发送邮件', ['liyong@addnewer.com'], 'TradingMax');
         if(!\$status) {

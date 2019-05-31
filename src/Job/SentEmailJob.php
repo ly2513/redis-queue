@@ -3,6 +3,7 @@
  * 发送邮件任务
  *
  */
+namespace Job;
 use Tools\Email;
 use RedisQueue\ReQueue\Log;
 

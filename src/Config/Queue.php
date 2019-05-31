@@ -65,14 +65,14 @@ class Queue
      *
      * @var string
      */
-    public static $jobPath = LIB_PATH . '/Job/';
+    public static $jobPath = LIB_PATH . 'Job/';
 
     /**
      * 设置日志目录
      *
      * @var string
      */
-    public static $logPath = LIB_PATH . '/Log/';
+    public static $logPath = LIB_PATH . 'Log/';
 
     /**
      * 设置如果失败将执行的次数
